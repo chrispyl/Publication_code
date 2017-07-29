@@ -62,11 +62,11 @@ Due to randomness, the following rules had to be applied in order to secure that
 
 ## Generation strategy for linear equations
 
-![alt text](http://gitlab.logismi.co/chripyli/paper-stuff/tree/master/sys-gen-images/linear.jpg "Generation strategy for linear equations")
+![alt text](sys-gen-images/linear.png "Generation strategy for linear equations")
 
 ## Generation strategy for non linear equations
 
-![alt text](http://gitlab.logismi.co/chripyli/paper-stuff/tree/master/sys-gen-images/non_linear.jpg "Generation strategy for non linear equations")
+![alt text](sys-gen-images/non_linear.png "Generation strategy for non linear equations")
 
 ## Something worth attention
 
