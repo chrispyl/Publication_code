@@ -1,36 +1,74 @@
 # sys-gen
 
-FIXME: description
-
-## Installation
-
-Download from http://example.com/FIXME.
+A generator for systems of random First Order Ordinary Differential Equations.
 
 ## Usage
 
-FIXME: explanation
+Go to the project folder in the dcommand line and type 
 
-    $ java -jar sys-gen-0.1.0-standalone.jar [args]
+    lein uberjar
 
-## Options
 
-FIXME: listing of options this app accepts.
+A folder named **target** will be created. Inside the folder their is a file named **sys-gen-0.1.0-standalone.jar**. To execute it, type
 
-## Examples
+    java -jar sys-gen-0.1.0-standalone.jar arg1 arg2 ...
 
-...
+## Arguments
 
-### Bugs
+An execution using the jar looks like this
 
-...
+    java -jar sys-gen-0.1.0-standalone.jar File-name Seed Weight-low Weight-high Initial-value-low Initial-value-high Double-precision Number-of-equations Number-of-teams Linear? Max-equation-size
 
-### Any Other Sections
-### That You Think
-### Might be Useful
+The arguments in the order they are taken are explained below
 
-## License
+**Argument** | **Description** | **Type**
+--- | --- | ---
+File-name | The file name where the results should be saved | String
+Seed | The seed for the random generator | Integer
+Weight-low | Minimum value of coefficients | Double
+Weight-high | Maximum value of coefficients | Double
+Initial-value-low | Minimum initial value of equations | Double
+Initial-value-high | Minimum initial value of equations | Double
+Double-precision | Decimal digits for coefficients | Integer
+Number-of-equations | Number of equations | Integer
+Number-of-teams | Number of teams | Integer
+Linear? | Linear or not | Boolean
+Max-equation-size | Maximum terms of equations | Integer
 
-Copyright © 2017 FIXME
+## Example
 
-Distributed under the Eclipse Public License either version 1.0 or (at
-your option) any later version.
+    java -jar sys-gen-0.1.0-standalone.jar system.txt 999 -5 5 0 10 2 100 4 false 3
+
+## Linear equation generation
+
+The operators used for this type of generation are ```+, -, *, /```
+
+## Non linear equation generation 
+
+The operators used for this type of generation are ```+, -, *, /, **```
+
+Also there are single argument functions ```abs, sqrt, exp, ln, sin, cos, atan```
+
+as well as double argument functions ```min, max```
+
+## Generation limitations
+
+Due to randomness, the following rules had to be applied in order to secure that the generated equations are able to be simulated.
+
+* A variable cannot be part of the denominator of a fraction
+* The exponents must be positive
+* The inputs of functions that cannot take negative numbers must be positive
+* Functions like ```cos, tan``` with a narrow input domain cannot used as it is hard to guarantee that the input adheres to their domain
+
+## Generation strategy for linear equations
+
+![alt text](http://gitlab.logismi.co/chripyli/paper-stuff/sys-gen-images/linear.jpg "Generation strategy for linear equations")
+
+## Generation strategy for non linear equations
+
+![alt text](http://gitlab.logismi.co/chripyli/paper-stuff/sys-gen-images/non_linear.jpg "Generation strategy for non linear equations")
+
+## Something worth attention
+
+In case of simulation, for a large number of iterations these systems will most probably lead to arithmetic underflows or overflows.
+To avoid this without using arithmetic libraries set the initial values to be zero.
