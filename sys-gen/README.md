@@ -2,7 +2,19 @@
 
 A generator for systems of random First Order Ordinary Differential Equations.
 
-## Usage
+[Usage](#Usage)  
+[Arguments](#Arguments)  
+[Example](#Example)  
+[Linear-equation-generation](#Linear-equation-generation)  
+[Non-linear-equation-generation](#Non-linear-equation-generation)  
+[Variable-names](#Variable-names)  
+[Generation-limitations](#Generation-limitations)  
+[Generation-strategy-for-linear-equations](#Generation-strategy-for-linear-equations)  
+[Generation-strategy-for-non-linear-equations](#Generation-strategy-for-non-linear-equations)  
+[Something-worth-attention](#Something-worth-attention)  
+[](#)
+
+## Usage <a name="Usage"></a>
 
 Go to the project folder in the dcommand line and type 
 
@@ -13,7 +25,7 @@ A folder named **target** will be created. Inside the folder their is a file nam
 
     java -jar sys-gen-0.1.0-standalone.jar arg1 arg2 ...
 
-## Arguments
+## Arguments <a name="Arguments"></a>
 
 An execution using the jar looks like this
 
@@ -35,15 +47,15 @@ Number-of-teams | Number of teams | Integer
 Linear? | Linear or not | Boolean
 Max-equation-size | Maximum terms of equations | Integer
 
-## Example
+## Example <a name="Example"></a>
 
     java -jar sys-gen-0.1.0-standalone.jar system.txt 999 -5 5 0 10 2 100 4 false 3
 
-## Linear equation generation
+## Linear equation generation <a name="Linear-equation-generation"></a>
 
 The operators used for this type of generation are ```+, -, *, /```
 
-## Non linear equation generation 
+## Non linear equation generation <a name="Non-linear-equation-generation"></a> 
 
 The operators used for this type of generation are ```+, -, *, /, **```
 
@@ -51,12 +63,12 @@ Also there are single argument functions ```abs, sqrt, exp, ln, sin, cos, atan``
 
 as well as double argument functions ```min, max```
 
-## Variable names
+## Variable names <a name="Variable-names"></a>
 
 The variable names are created using an alphabet by the combining its letters. The alphabet was initially decided to be the english one with lowercase letters.
 As a result combinations like ```ln, min``` appeared which collided with the naming conventions of our parser. To avoid this, the alphabet was modified and each letter is followed by an underscore ```a_, b_, ...```.
 
-## Generation limitations
+## Generation limitations <a name="Generation-limitations"></a>
 
 Due to randomness, the following rules had to be applied in order to secure that the generated equations are able to be simulated.
 
@@ -65,15 +77,15 @@ Due to randomness, the following rules had to be applied in order to secure that
 * The inputs of functions that cannot take negative numbers must be positive
 * Functions like ```cos, tan``` with a narrow input domain cannot used as it is hard to guarantee that the input adheres to their domain
 
-## Generation strategy for linear equations
+## Generation strategy for linear equations <a name="Generation-strategy-for-linear-equations"></a>
 
 ![alt text](sys-gen-images/linear.png "Generation strategy for linear equations")
 
-## Generation strategy for non linear equations
+## Generation strategy for non linear equations <a name="Generation-strategy-for-non-linear-equations"></a>
 
 ![alt text](sys-gen-images/non_linear.png "Generation strategy for non linear equations")
 
-## Something worth attention
+## Something worth attention <a name="Something-worth-attention"></a>
 
 In case of simulation, for a large number of iterations these systems will most probably lead to arithmetic underflows or overflows.
 To avoid this without using arithmetic libraries set the initial values to be zero.
