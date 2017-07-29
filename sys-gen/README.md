@@ -51,6 +51,11 @@ Also there are single argument functions ```abs, sqrt, exp, ln, sin, cos, atan``
 
 as well as double argument functions ```min, max```
 
+## Variable names
+
+The variable names are created using an alphabet by the combining its letters. The alphabet was initially decided to be the english one with lowercase letters.
+As a result combinations like ```ln, min``` appeared which collided with the naming conventions of our parser. To avoid this, the alphabet was modified and each letter is followed by an underscore ```a_, b_, ...```.
+
 ## Generation limitations
 
 Due to randomness, the following rules had to be applied in order to secure that the generated equations are able to be simulated.
