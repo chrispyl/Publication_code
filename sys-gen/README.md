@@ -16,7 +16,7 @@ A generator for systems of random First Order Ordinary Differential Equations.
 
 ## Usage <a name="Usage"></a>
 
-Go to the project folder in the dcommand line and type 
+Go to the project folder in the command line and type 
 
     lein uberjar
 
@@ -40,7 +40,7 @@ Seed | The seed for the random generator | Integer
 Weight-low | Minimum value of coefficients | Double
 Weight-high | Maximum value of coefficients | Double
 Initial-value-low | Minimum initial value of equations | Double
-Initial-value-high | Minimum initial value of equations | Double
+Initial-value-high | Maximum initial value of equations | Double
 Double-precision | Decimal digits for coefficients | Integer
 Number-of-equations | Number of equations | Integer
 Number-of-teams | Number of teams | Integer
