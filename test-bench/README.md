@@ -1,6 +1,9 @@
 # test-bench
 
-The test-bench for our methods. The methods included are serial, across the method, across the system and mixed.
+The test-bench for our methods.  
+The methods included are serial, across the method, across the system and mixed.  
+The results are saved to a file chosen by the user.  
+During the tests, a file named *report.txt* is created which contains the test parameters being tested at that moment.
 
 [Usage](#Usage)  
 [Arguments](#Arguments)  
