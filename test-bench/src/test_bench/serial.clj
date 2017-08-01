@@ -43,11 +43,11 @@
 
 (defn euler-method 
 	([iter step value-map func-name params-subvector func]
-		(+ ((func-name value-map) iter) (* step (calc-func iter func-name value-map params-subvector func))))
+		(+ ((func-name value-map) iter) (* 1 (calc-func iter func-name value-map params-subvector func))))
 	([iter step value-map outer-dependencies-produced-values-map func-name params-subvector func]
-		(+ ((func-name value-map) iter) (* step (calc-func iter func-name value-map outer-dependencies-produced-values-map params-subvector func)))))	
+		(+ ((func-name value-map) iter) (* 1 (calc-func iter func-name value-map outer-dependencies-produced-values-map params-subvector func)))))	
 	
-(defn serial-integration [start end step system-map fileValues]
+(defn serial-integration [iterations system-map fileValues]
 	(let  [whole-system-keys (keys system-map)
 		   init-vals-map (create-init-vals-map system-map)
 		   value-map (create-value-map system-map init-vals-map) ;this is a TRANSIENT map with TRANSIENT values
@@ -63,13 +63,12 @@
 		   simple-eqs-fn-vector (create-fn-vector simple-eqs-map ordered-simple-eqs)
 		   system-map-keys (keys system-map)
 		   simple-eqs-map-keys ordered-simple-eqs
-		   iterations (long (quot (- end start) step))
 		   final-value-map (loop [iter 0 vm value-map]
 								(if (< iter iterations)
 									(let [value-map-after-diffs-assoced (loop [ks system-map-keys m vm pv params-vector fv fn-vector]
 																			(if (empty? ks)
 																				m
-																				(recur (next ks) (assoc! m (first ks) (conj! ((first ks) m) (euler-method iter step m (first ks) (first pv) (first fv)))) (next pv) (next fv))))									
+																				(recur (next ks) (assoc! m (first ks) (conj! ((first ks) m) (euler-method iter 1 m (first ks) (first pv) (first fv)))) (next pv) (next fv))))									
 										  value-map-after-eqs-assoced (loop [ks ordered-simple-eqs m value-map-after-diffs-assoced params-vec simple-eqs-params-vector fn-vec simple-eqs-fn-vector]
 																			(if (empty? ks)
 																				m
