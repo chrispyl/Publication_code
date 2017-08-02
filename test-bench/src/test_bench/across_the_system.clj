@@ -85,7 +85,7 @@
 		(zipmap (keys pers-value-map) pers-vectors)))			
 				 
 	
-(defn partition-labour [iterations subsystems-map system-map fileValues]
+(defn partition-labour-across-the-system [iterations subsystems-map system-map fileValues]
 	(let [gos (doall ;without doall only 1 go starts
 					(map #(async/go (serial-integration iterations % fileValues)) (:independent subsystems-map)))
 		  independent-result (apply merge (map #(async/<!! %) gos))

@@ -137,5 +137,5 @@
 	(let [fns-atoms-map (create-fns-atoms-map system-map iterations fileValues)
 		 gos (doall 
 				(map #(async/go (calc-funcs-in-chunk iterations 1 fns-atoms-map %)) subsystems))]
-		fns-atoms-map))	
+		(create-result-map-for-across-the-method fns-atoms-map)))	
 		  

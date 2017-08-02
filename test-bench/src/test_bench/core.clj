@@ -1,8 +1,8 @@
 (ns test-bench.core
 	(:require  
-			  [test-bench.across-the-method :refer [across-the-method-integration create-result-map-for-across-the-method create-subsystem-list]]
+			  [test-bench.across-the-method :refer [across-the-method-integration create-subsystem-list]]
 			  [test-bench.infix-equation-handling :refer [create-system-map]]
-			  [test-bench.across-the-system :refer [partition-labour create-result-map]]
+			  [test-bench.across-the-system :refer [partition-labour-across-the-system]]
 			  [test-bench.system-generator :refer [system-generator]]
 			  [test-bench.teamming :refer [create-team-map create-subsystem-map work-sharing]]
 			  [test-bench.serial :refer [serial-integration]]
@@ -10,28 +10,17 @@
 			  [test-bench.mixed :refer [partition-labour-mixed]]
 			  [clojure.string :as str])
 	(:gen-class))	
-
-(defn prepare-mixed [iterations system-map available-cores cores-for-across-the-method fileValues]
-	(let [team-map (create-team-map system-map fileValues)
-		 subsystems-map (create-subsystem-map team-map system-map available-cores)
-		 result (partition-labour-mixed iterations subsystems-map cores-for-across-the-method fileValues)]
-		(create-result-map-for-across-the-method result)))	
+	
 	
 (defn prepare-across-the-system [iterations system-map available-cores fileValues]
 	(let [team-map (create-team-map system-map fileValues)
-		 subsystems-map (create-subsystem-map team-map system-map available-cores)
-		 result (partition-labour iterations subsystems-map system-map fileValues)]
-		(create-result-map (keys result) (vals result))))		  
+		 subsystems-map (create-subsystem-map team-map system-map available-cores)]
+		[team-map subsystems-map]))		  
 		  
 (defn prepare-across-the-method [iterations system-map available-cores fileValues]
 	(let [team-map (work-sharing (keys system-map) available-cores)
-		 subsystems (create-subsystem-list team-map system-map)
-		 result (across-the-method-integration iterations subsystems system-map fileValues)]
-		(create-result-map-for-across-the-method result)))
-		  
-(defn prepare-serial [iterations system-map fileValues]
-	(let [result (serial-integration iterations system-map {})]
-		(create-result-map (keys result) (vals result))))		  
+		 subsystems (create-subsystem-list team-map system-map)]
+		[team-map subsystems]))
 		  
 (defn -main [file-name core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?]
 	(let [core-vector (mapv #(Integer/parseInt %) (str/split core-array #","))
@@ -59,10 +48,18 @@
 								(do
 									(spit "progress.txt" (str cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)) :append true)
 									
-									(let [bench-result-serial (dissoc (bench-with-result (prepare-serial iterations system-map {})) :results :samples :input-arguments)
-										 bench-result-across-the-method (dissoc (bench-with-result (prepare-across-the-method iterations system-map cores {})) :results :samples :input-arguments)
-										 bench-result-across-the-system (dissoc (bench-with-result (prepare-across-the-system iterations system-map cores {})) :results :samples :input-arguments)
-										 bench-results-for-mixed (doall (map #(dissoc % :results :samples :input-arguments) (map #(bench-with-result (prepare-mixed iterations system-map cores % {})) core-vector-for-mixed)))] ;this do all is to force it to evaluate in order to be printed at the same time with the others next and not wait
+									(let [bench-result-serial (dissoc (bench-with-result (serial-integration iterations system-map {})) :results :samples :input-arguments)
+										 
+										 [team-map subsystems] (prepare-across-the-method iterations system-map cores {})
+										 bench-result-across-the-method (dissoc (bench-with-result (across-the-method-integration iterations subsystems system-map {})) :results :samples :input-arguments)
+										 
+										 [team-map subsystems-map] (prepare-across-the-system iterations system-map cores {})
+										 bench-result-across-the-system (dissoc (bench-with-result (partition-labour-across-the-system iterations subsystems-map system-map {})) :results :samples :input-arguments)
+										 
+										 bench-results-for-mixed (doall 
+																	(map #(dissoc % :results :samples :input-arguments) 
+																		(map #(bench-with-result (partition-labour-mixed iterations subsystems-map % {})) 
+																			core-vector-for-mixed)))] ;this do-all is to force it to evaluate in order to be printed at the same time with the others next and not wait
 										 
 										(spit file-name (str "Serial: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)
 										(spit file-name (str bench-result-serial (System/lineSeparator)) :append true)

@@ -150,7 +150,7 @@
 						 (map #(async/<!! %) gos))
 		 independent-results (apply merge (map #(create-result-map-for-across-the-method %) fns-atoms-maps))
 		 fns-atoms-map (across-the-method-integration iterations dependent-subsystems (subsystems-map :dependent) (merge independent-results fileValues))] ;Nothing to do with filevalues, just merge here in order to avoid extra handling of the results inside the dependent part. 
-		fns-atoms-map))		
+		(create-result-map-for-across-the-method fns-atoms-map)))		
 	
 	
 	
