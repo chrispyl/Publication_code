@@ -1,7 +1,0 @@
-2 cores, 5 equations, 1 teams, 2 max-equation-size
-3 cores, 5 equations, 1 teams, 2 max-equation-size
-4 cores, 5 equations, 1 teams, 2 max-equation-size
-2 cores, 5 equations, 1 teams, 3 max-equation-size
-3 cores, 5 equations, 1 teams, 3 max-equation-size
-4 cores, 5 equations, 1 teams, 3 max-equation-size
-2 cores, 5 equations, 1 teams, 4 max-equation-size
