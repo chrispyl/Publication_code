@@ -8,7 +8,7 @@ During the tests, a file named *report.txt* is created which contains the test p
 [Usage](#Usage)  
 [Arguments](#Arguments)  
 [Example](#Example)  
-
+[Benchmarking once](#Benchmarking_once)
 
 ## Usage <a name="Usage"></a>
 
@@ -51,3 +51,101 @@ Linear? | Linear or not | Boolean
 The arguments with *array* in their name are meant to be multiple and seperated by commas like below
 
     java -jar test-bench-0.1.0-standalone.jar results.txt 5,10,15 2,4 10,20 100,1000,10000 5,6,7,8 50,100,1000 999 -5 5 0 10 2 false
+    
+## Benchmarking once for every parameter combination <a name="Benchmarking_once"></a>
+
+The methods accept combinations of the number of cores, cores for mixed method, teams, equations, iterations and max equation size. The total number of combinations
+depends on the size of each array and equals
+
+    combinations_num = Core-array_size * Core-array-for-mixed_size * Team-array_size * Equation-array_size * Max-equation-size-array_size * Iterations-array_size
+    
+Also, we have 4 methods to test and that means that the total number of benchmarks will be
+
+    benchmarks_num = 4 * combinations_num
+    
+In addition, every benchmark executes the given method 60 times in order to provide reliable results.
+
+    execution_count = 60 * 4 * combinations_num
+    
+For a hypothetical case where
+
+    Core-array                  [2 4 6]
+    Core-array-for-mixed        [2 4]
+    Team-array                  [10 20 50]
+    Equation-array              [100 1000 10000]
+    Max-equation-size-array     [3]
+    Iterations-array            [100 1000 10000]
+    
+the total execution count is
+
+    total_execution_count = 60 * 4 * (3 * 2 * 3 * 3 * 1 * 3) = 38880
+    
+These executions vary in length from milliseconds to minutes depending on the method tested. It is safe to say that the calculations will last days on our equipment.  
+
+To save time and maybe have the opportunity to extend a bit more the arrays we have to benchmark each method for a given combination once.
+This may seem obvious but with a bit carelessness it's easy to benchmark methods multiple times. Finding all the combinations of the parameters of interest
+and putting them to the methods will result to multiple benchmarking of the methods for the same parameters. For example, suppose that we have two combinations
+that differ only in the number of teams. The serial method doesn't depend on that parameter but it will be benchmarked twice. It's getting even worse when the equation count and 
+iterations rise, where the aforementioned benchmark could take hours to complete.
+
+To solve this problem we can find which parameters affect each method and don't repeat the benchmark again for some parameter combinations. For example, instead of
+calculating all the possible combinations like this
+
+```clojure
+(for [equations-num Equation-array]
+     [cores-for-mixed Core-array-for-mixed]
+     [max-equation-size Max-equation-size-array]
+     [iterations Iterations-array]
+     [teams-num Team-array]
+     [cores Core-array]
+     
+     (bench 
+        (serial-method ....)))
+```
+
+we could avoid calculating for several ```team-num``` and ```cores``` by 
+
+
+```clojure
+(for [equations-num Equation-array]
+     [cores-for-mixed Core-array-for-mixed]
+     [max-equation-size Max-equation-size-array]
+     [iterations Iterations-array]
+     
+     (do
+        (bench 
+            (serial-method ....))
+     
+     (for [teams-num Team-array]
+          [cores Core-array]
+          
+          ;rest methods
+          )))
+```
+
+The problem doing it in that way, is that the methods depend from different parameters and that creates conflicts when we try to place them in the right order.
+Also, the system-generator will have to generate multiple systems depending on the parameters which means that a system must exist for the methods to calculate.
+This really doesn't have a solution by reordering the methods and the generator between the parameter changes.
+
+An alternative solution is to have a set for each method which will hold maps. These maps will have as keys the parameters and values their values. Before benchmarking a method,
+a check will be made to see if this combination has been benchmarked already.
+
+A more elegant solution is to use memoization. By memoizing a function, a map is created which has as keys the inputs of the function and as values the result. When
+an input combination appears again the results is returned instead of calculating it again. We could say that it works like caching. This is the solution used in our
+test-bench.
+
+Furthermore, it may seem that not all methods need memoization. For example, the mixed one which depends from all the parameters in the combinations. Well, that is not the case
+as under certain conditions it will have to repeat a benchmark. An example is when ```cores``` is the only parameter that changes **and** the ```teams-num``` is
+lower than ```cores```. As a result, we have to memoize all the methods. As a proof a small test has been made giving the input 
+    
+```clojure
+(-main "results.txt" "2,3" "2" "2" "10" "3" "10" "999" "-5" "5" "0" "0" "2" "false")
+```
+
+in the repl. The execution time of the above was measured with the ```time``` function which is not reliable but gives a rough estimate of the execution time of the
+expression wrapped in it. The results were
+
+    non memoized methods: ~690 s
+    with memoized methods: ~430 s
+    
+This is 4 minutes faster even for this small test.    
