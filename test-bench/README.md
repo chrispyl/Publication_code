@@ -145,7 +145,7 @@ lower than ```cores```. As a result, we have to memoize all the methods. As a pr
 in the repl. The execution time of the above was measured with the ```time``` function which is not reliable but gives a rough estimate of the execution time of the
 expression wrapped in it. The results were
 
-    non memoized methods: ~690 s
-    with memoized methods: ~430 s
+    non memoized methods: 11.5 min
+    with memoized methods: 7.16 min
     
 This is 4 minutes faster even for this small test.    
