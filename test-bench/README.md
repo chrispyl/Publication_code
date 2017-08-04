@@ -17,7 +17,7 @@ For higher amounts of equations and iterations we get
 
     java.lang.OutOfMemoryError: GC overhead limit exceeded
     
-The reason is that the garbage collector runs for 98% of the CPU time. This is due to many large objects being created and left behind
+The reason is that the garbage collector runs for 98% of the CPU time. This is due to head retention to large objects, as well as many large objects being created and left behind
 for the GC at a very fast rate. Trying several flags for the JVM which among others increase the available memory has no effect and only 
 makes the program run for a few more minutes.
 
@@ -46,6 +46,7 @@ The solutions are:
 
 * To not include in the tests such high inputs and continue using Criterium
 * To include a bit higher inputs -> remove criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
+* To remove the transients from the methods who use them (which become huge and don't get garbage collected), and continue using Criterium at the expense of execution time
 
 
 ## Usage <a name="Usage"></a>
