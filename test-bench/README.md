@@ -46,7 +46,7 @@ The solutions are:
 
 * To not include in the tests such high inputs and continue using Criterium
 * To include a bit higher inputs -> remove criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
-* To remove the transients from the methods who use them (which become huge and don't get garbage collected), and continue using Criterium at the expense of execution time
+* To remove the transients from the methods who use them (which become huge and don't get garbage collected) and continue using Criterium, at the expense of execution time
 
 
 ## Usage <a name="Usage"></a>
