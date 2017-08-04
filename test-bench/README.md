@@ -40,7 +40,7 @@ makes the program run for a few more minutes.
     -XX:+DoEscapeAnalysis
     
 An example input to trigger this error is for 10.000 iterations and 100 equations. It is believed that Criterium has something to do with it because when running the methods with the 
-previous and a bit higher inputs, the error doesn't appear. Of course when the input gets too high like 10.000 iterations and 1.000 equations it appears again.
+previous and a bit higher inputs, the error doesn't appear. Of course when the input gets as high as 10.000 iterations and 1.000 equations it appears again.
 
 The solutions are:
 
