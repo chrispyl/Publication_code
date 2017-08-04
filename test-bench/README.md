@@ -10,6 +10,43 @@ During the tests, a file named *report.txt* is created which contains the test p
 [Example](#Example)  
 [Benchmarking once](#Benchmarking_once)
 
+## Problems
+
+For higher amounts of equations and iterations we get
+
+    java.lang.OutOfMemoryError: GC overhead limit exceeded
+    
+The reason is that the garbage collector runs for 98% of the CPU time. This is due to many large objects being created and left behind
+for the GC at a very fast rate. Trying several flags for the JVM which among others increase the available memory has no effect and only 
+makes the program run for a few more minutes.
+
+    -Xmx4g
+    -server
+    -d64
+    -da
+    -dsa
+    -XX:+UseConcMarkSweepGC
+    -XX:+UseParNewGC
+    -XX:ParallelCMSThreads=4
+    -XX:+ExplicitGCInvokesConcurrent
+    -XX:+CMSParallelRemarkEnabled
+    -XX:-CMSIncrementalPacing
+    -XX:+UseCMSInitiatingOccupancyOnly
+    -XX:CMSIncrementalDutyCycle=100
+    -XX:CMSInitiatingOccupancyFraction=90
+    -XX:CMSIncrementalSafetyFactor=10
+    -XX:+CMSClassUnloadingEnabled"
+    -XX:+DoEscapeAnalysis
+    
+An example input to trigger this error is for 10.000 iterations and 100 equations. It is believed that Criterium has something to do with it because when running the methods with the 
+previous and a bit higher inputs, the error doesn't appear. Of course when the input gets too high like 10.000 iterations and 1.000 equations it appears again.
+
+The solutions are:
+
+* To not include in the tests such high inputs and continue using Criterium
+* To include a bit higher inputs -> remove criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
+
+
 ## Usage <a name="Usage"></a>
 
 Go to the project folder in the command line and type 
