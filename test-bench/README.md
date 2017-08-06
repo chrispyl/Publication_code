@@ -86,7 +86,7 @@ The solutions are:
 5. To keep only the data needed for next iterations     
 
     From another perspective, we want to test how the methods compare to each other depending on execution speed. We don't care how or where the results are stored. Someone with better hardware will not have this issue,
-    some other won't same all the results in one data structure but instead will serialize them every x iterations.
+    some other won't store all the results in one data structure but instead will serialize them every x iterations.
     
     So, for the ```serial``` and the ```across the system methods```, this means to keep only the values of the previous iterations. 
     
