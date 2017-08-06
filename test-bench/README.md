@@ -71,10 +71,21 @@ The solutions are:
     This was tested and is best solution so far. While dealing with transients many intermediate collections were created and occupied the heap too fast. By removing them
     the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1.000 equations.
 
-4. To use primitives instead of boxed types in combination with 4.
+4. ~~To use primitives instead of boxed types in combination with 4.~~
 
     As said earlier when primitives enter collections they are boxed and enter the heap. To avoid this we could use arrays. The problem is that this is possible only in the serial method and the across the system one.
     The rest use as a synchronization mechanism ```promises``` inside the vectors with the results, which can't be put into arrays. So, this solution is not really an option.
+
+5. To keep only the data needed for next iterations     
+
+    For the ```serial``` and the ```across the system methods```, this means to keep only the values of the previous iterations. 
+    
+    For the ```across the method``` and the ```mixed one```, this 
+    
+6. Measures not related to the methods     
+
+    Increase heap size.
+    Use the ```quick-bench``` mode of Criterium to execute less times each method. Between the executions, the GC can't clear all the data of the previous execution and the heap is filled more. By executing less times less garbage will be on heap between the executions and the benchmark will complete before the heap blows.
 
 ### Regarding the parsing of the equations
 
