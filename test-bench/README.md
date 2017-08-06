@@ -19,13 +19,13 @@ For higher amounts of equations and iterations we get
 
     java.lang.OutOfMemoryError: GC overhead limit exceeded
     
-The reason is that the garbage collector runs for 98% of the CPU time. This can be due to head retention of some sequence which takes up a lot of heap, as well as many large objects being created and left behind
+Generally, this means that the garbage collector runs for 98% of the CPU time. This can be due to head retention of some sequence which takes up a lot of heap, as well as many large objects being created and left behind
 for the GC at a very fast rate. In both cases the GC is triggered in order to free heap space but it is unable to do so and the loop continues.
 
 In our case, the reason is that during the integration we store the previously produced values in collections. In Clojure, when primitives are put into collections they are
 auto-boxed. This means that they are wrapped into objects and end up to the heap. 
 
-Trying several flags for the JVM which among others increase the available memory has no effect and only makes the program run for a few more minutes.
+Trying several flags for the JVM which among others increase the available heap size has no effect and only makes the program run for a few more minutes.
 
     -Xmx4g
     -server
