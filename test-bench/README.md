@@ -72,7 +72,7 @@ The solutions are:
     the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1.000 equations. The concern is
     that we cannot benchmark with Criterium without the error occuring. Maybe if we also quadraple the heap...
     
-    The image below shows this option for 10.000 iterations and 1.000 equations, and an increased heap to 2Gb. The heap is dynamically adjusted by the JVM with maximum size 2GB. As it seems,
+    The schreenshot below is taken from the JVisualVM and shows this option for 10.000 iterations and 1.000 equations, and an increased heap to 2Gb. The heap is dynamically adjusted by the JVM with maximum size 2GB. As it seems,
     for some time it can handle the executions but after a while the heap is not enough and the GC starts woriking too much and not freeing space.
     
     ![alt text](test-bench-images/heap.png "heap 10.000 iterations, 1.000 equations")
@@ -86,7 +86,8 @@ The solutions are:
 
     For the ```serial``` and the ```across the system methods```, this means to keep only the values of the previous iterations. 
     
-    For the ```across the method``` and the ```mixed one```, this 
+    For the ```across the method``` and the ```mixed one```, this is dangerous as other threads might seek values produced long before from a thread. In our case where the equations
+    have specific form this is not possible and if we keep the last 10-100 results for each equation we should be ok.
     
 6. Measures not related to the methods     
 
