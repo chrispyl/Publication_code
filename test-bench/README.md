@@ -45,7 +45,8 @@ Trying several flags for the JVM which among others increase the available heap 
     -XX:+CMSClassUnloadingEnabled"
     -XX:+DoEscapeAnalysis
     
-To trigger this error in a machine with 4Gb ram (where the JVM automatically puts 1Gb heap) we can try to produce 1.000.000 elements (doubles), e.g 10.000 iterations and 100 equations. It is believed that Criterium has something to do with it (maybe can't trigger the GC among the runs) because when running the methods with the 
+To trigger this error in a machine with 4Gb ram (where the JVM automatically puts 1Gb heap) we can try to produce 1.000.000 elements (doubles), e.g 10.000 iterations and 100 equations.
+It is believed that Criterium has something to do with it (maybe can't trigger the GC among the runs) because when running the methods without Criterium with the 
 previous and a bit higher iterations, the error doesn't appear. Of course for higher numbers such 10.000.000 elements, e.g 10.000 iterations and 1.000 equations it appears again.
 
 The solutions are:
@@ -60,20 +61,20 @@ The solutions are:
 
 2. To include a bit higher inputs -> **remove** criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
 
-    We can't achieve the same reliable results without Criterium. Also, the benefit would be just another oder of magnitude. For example, the combination of
+    We can't achieve the same reliable results without Criterium. Also, the benefit would be just another order of magnitude. For example, the combination of
     
-        10.000 iterations - equations 
+        10.000 iterations - 100 equations 
         
     would be possible but not much after that.    
 
 3. To remove the transients (which easily lead to head retention) at the expense of execution time from the methods who use them, and **maybe continue** using Criterium
 
     While dealing with transients many intermediate collections are created and occupy the heap too fast. By removing them
-    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1.000 equations. The concern is
+    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher (tested) e.g 100.000.000 elements or 10.000 iterations 1.000 equations. The concern is
     that we cannot benchmark with Criterium without the error occuring. Maybe if we also quadraple the heap...
     
-    The schreenshot below is taken from the JVisualVM and shows this option for 10.000 iterations and 1.000 equations, and an increased heap to 2Gb. The heap is dynamically adjusted by the JVM with maximum size 2GB. As it seems,
-    for some time it can handle the executions but after a while the heap is not enough and the GC starts woriking too much and not freeing space.
+    The schreenshot below is taken from the JVisualVM. It shows the aforementioned option for 10.000 iterations and 1.000 equations while benchmarking with Criterium, and an increased heap to 2Gb. The heap is dynamically adjusted by the JVM with maximum size 2GB. As it seems,
+    for some time it can handle the executions but after a while the heap is not enough and the GC starts working too much and not freeing space.
     
     ![alt text](test-bench-images/heap.png "heap 10.000 iterations, 1.000 equations")
 
@@ -86,13 +87,14 @@ The solutions are:
 
     For the ```serial``` and the ```across the system methods```, this means to keep only the values of the previous iterations. 
     
-    For the ```across the method``` and the ```mixed one```, this is dangerous as other threads might seek values produced long before from a thread. In our case where the equations
-    have specific form this is not possible and if we keep the last 10-100 results for each equation we should be ok.
+    For the ```across the method``` and the ```mixed one```, this is dangerous as other threads might seek values produced long ago from a thread. In our case where the equations
+    have specific form, and the load is equally balanced among the threads, this is shouldn't be possible and if we keep the last 10-100 results for each equation we should be ok.
     
 6. Measures not related to the methods     
 
     Increase heap size.  
-    Use the ```quick-bench``` mode of Criterium to execute less times each method. Between the executions, the GC can't clear all the data of the previous execution and the heap is filled more. By executing less times less garbage will be on heap between the executions and the benchmark will complete before the heap blows.
+    Use the ```quick-bench``` mode of Criterium to execute less times each method. Between the executions, the GC can't clear all the data of the previous execution and the heap is filled more. 
+    By executing less times less garbage will be on heap between the executions and the benchmark will complete before the heap is completely occupied.
 
 ### Regarding the parsing of the equations
 
