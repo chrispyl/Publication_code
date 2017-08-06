@@ -45,7 +45,7 @@ Trying several flags for the JVM which among others increase the available heap 
     -XX:+CMSClassUnloadingEnabled"
     -XX:+DoEscapeAnalysis
     
-To trigger this error we can try to produce 1.000.000 elements, e.g 10.000 iterations and 100 equations. It is believed that Criterium has something to do with it (maybe can't trigger the GC among the runs) because when running the methods with the 
+To trigger this error in a machine with 4Gb ram (where the JVM automatically puts 1Gb heap) we can try to produce 1.000.000 elements (doubles), e.g 10.000 iterations and 100 equations. It is believed that Criterium has something to do with it (maybe can't trigger the GC among the runs) because when running the methods with the 
 previous and a bit higher iterations, the error doesn't appear. Of course for higher numbers such 10.000.000 elements, e.g 10.000 iterations and 1.000 equations it appears again.
 
 The solutions are:
