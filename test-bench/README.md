@@ -13,6 +13,8 @@ During the tests, a file named *report.txt* is created which contains the test p
 
 ## Problems <a name="Problems"></a>
 
+### Regarding the maximum iterations-equations
+
 For higher amounts of equations and iterations we get
 
     java.lang.OutOfMemoryError: GC overhead limit exceeded
@@ -67,12 +69,20 @@ The solutions are:
 3. To remove the transients (which easily lead to head retention) at the expense of execution time from the methods who use them, and **maybe continue** using Criterium
 
     This was tested and is best solution so far. While dealing with transients many intermediate collections were created and occupied the heap too fast. By removing them
-    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1000 equations.
+    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1.000 equations.
 
 4. To use primitives instead of boxed types in combination with 4.
 
     As said earlier when primitives enter collections they are boxed and enter the heap. To avoid this we could use arrays. The problem is that this is possible only in the serial method and the across the system one.
     The rest use as a synchronization mechanism ```promises``` inside the vectors with the results, which can't be put into arrays. So, this solution is not really an option.
+
+### Regarding the parsing of the equations
+
+For high numbers of equations e.g 10.000 equations, the parsing takes a really long time (hours) complete.
+
+The solutions are:
+
+1. Cut down some steps which won't be used now, like the constant replacing, detection of non differential equations etc which are believed to be the root of the problem.
 
 ## Usage <a name="Usage"></a>
 
