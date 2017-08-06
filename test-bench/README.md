@@ -48,31 +48,31 @@ previous and a bit higher iterations, the error doesn't appear. Of course for hi
 
 The solutions are:
 
-1. To not include in the tests such high inputs and continue using Criterium
+1. To not include in the tests such high inputs and **continue** using Criterium
 
-This is too limiting as we will have to stay **under** the
-
-    10.000 iterations - 100 equations
-    or
-    1.000 iterations - 1.000 equations
-
-2. To include a bit higher inputs -> remove criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
-
-We can't achieve the same reliable results without Criterium. Also, the benefit would be just another oder of magnitude. For example, the combination of
-
-    10.000 iterations - equations 
+    This is too limiting as we will have to stay **under** the
     
-would be possible but not much after that.    
+        10.000 iterations - 100 equations
+        or
+        1.000 iterations - 1.000 equations
 
-3. To remove the transients (which easily lead to head retention) at the expense of execution time from the methods who use them, and continue using Criterium
+2. To include a bit higher inputs -> **remove** criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
 
-This was tested and is best solution so far. While dealing with transients many intermediate collections were created and occupied the heap too fast. By removing them
-the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1000 equations.
+    We can't achieve the same reliable results without Criterium. Also, the benefit would be just another oder of magnitude. For example, the combination of
+    
+        10.000 iterations - equations 
+        
+    would be possible but not much after that.    
+
+3. To remove the transients (which easily lead to head retention) at the expense of execution time from the methods who use them, and **maybe continue** using Criterium
+
+    This was tested and is best solution so far. While dealing with transients many intermediate collections were created and occupied the heap too fast. By removing them
+    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1000 equations.
 
 4. To use primitives instead of boxed types in combination with 4.
 
-As said earlier when primitives enter collections they are boxed and enter the heap. To avoid this we could use arrays. The problem is that this is possible only in the serial method and the across the system one.
-The rest use as a synchronization mechanism ```promises``` which can't be put into arrays. So, this solution is not really a choice.
+    As said earlier when primitives enter collections they are boxed and enter the heap. To avoid this we could use arrays. The problem is that this is possible only in the serial method and the across the system one.
+    The rest use as a synchronization mechanism ```promises``` inside the vectors with the results, which can't be put into arrays. So, this solution is not really an option.
 
 ## Usage <a name="Usage"></a>
 
