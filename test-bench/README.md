@@ -17,9 +17,13 @@ For higher amounts of equations and iterations we get
 
     java.lang.OutOfMemoryError: GC overhead limit exceeded
     
-The reason is that the garbage collector runs for 98% of the CPU time. This is due to head retention to large objects, as well as many large objects being created and left behind
-for the GC at a very fast rate. Trying several flags for the JVM which among others increase the available memory has no effect and only 
-makes the program run for a few more minutes.
+The reason is that the garbage collector runs for 98% of the CPU time. This can be due to head retention of some sequence which takes up a lot of heap, as well as many large objects being created and left behind
+for the GC at a very fast rate. In both cases the GC is triggered in order to free heap space but it is unable to do so and the loop continues.
+
+In our case, the reason is that during the integration we store the previously produced values in collections. In Clojure, when primitives are put into collections they are
+auto-boxed. This means that they are wrapped into objects and end up to the heap. 
+
+Trying several flags for the JVM which among others increase the available memory has no effect and only makes the program run for a few more minutes.
 
     -Xmx4g
     -server
@@ -39,15 +43,36 @@ makes the program run for a few more minutes.
     -XX:+CMSClassUnloadingEnabled"
     -XX:+DoEscapeAnalysis
     
-An example input to trigger this error is for 10.000 iterations and 100 equations. It is believed that Criterium has something to do with it because when running the methods with the 
-previous and a bit higher inputs, the error doesn't appear. Of course when the input gets as high as 10.000 iterations and 1.000 equations it appears again.
+To trigger this error we can try to produce 1.000.000 elements, e.g 10.000 iterations and 100 equations. It is believed that Criterium has something to do with it (maybe can't trigger the GC among the runs) because when running the methods with the 
+previous and a bit higher iterations, the error doesn't appear. Of course for higher numbers such 10.000.000 elements, e.g 10.000 iterations and 1.000 equations it appears again.
 
 The solutions are:
 
-* To not include in the tests such high inputs and continue using Criterium
-* To include a bit higher inputs -> remove criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
-* To remove the transients from the methods who use them (which become huge and don't get garbage collected) and continue using Criterium, at the expense of execution time
+1. To not include in the tests such high inputs and continue using Criterium
 
+This is too limiting as we will have to stay **under** the
+
+    10.000 iterations - 100 equations
+    or
+    1.000 iterations - 1.000 equations
+
+2. To include a bit higher inputs -> remove criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
+
+We can't achieve the same reliable results without Criterium. Also, the benefit would be just another oder of magnitude. For example, the combination of
+
+    10.000 iterations - equations 
+    
+would be possible but not much after that.    
+
+3. To remove the transients (which easily lead to head retention) at the expense of execution time from the methods who use them, and continue using Criterium
+
+This was tested and is best solution so far. While dealing with transients many intermediate collections were created and occupied the heap too fast. By removing them
+the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1000 equations.
+
+4. To use primitives instead of boxed types in combination with 4.
+
+As said earlier when primitives enter collections they are boxed and enter the heap. To avoid this we could use arrays. The problem is that this is possible only in the serial method and the across the system one.
+The rest use as a synchronization mechanism ```promises``` which can't be put into arrays. So, this solution is not really a choice.
 
 ## Usage <a name="Usage"></a>
 
