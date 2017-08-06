@@ -68,8 +68,14 @@ The solutions are:
 
 3. To remove the transients (which easily lead to head retention) at the expense of execution time from the methods who use them, and **maybe continue** using Criterium
 
-    This was tested and is best solution so far. While dealing with transients many intermediate collections were created and occupied the heap too fast. By removing them
-    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1.000 equations.
+    While dealing with transients many intermediate collections are created and occupy the heap too fast. By removing them
+    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher e.g 100.000.000 elements or 10.000 iterations 1.000 equations. The concern is
+    that we cannot benchmark with Criterium without the error occuring. Maybe if we also quadraple the heap...
+    
+    The image below shows this option for 10.000 iterations and 1.000 equations, and an increased heap to 2Gb. The heap is dynamically adjusted by the JVM with maximum size 2GB. As it seems,
+    for some time it can handle the executions but after a while the heap is not enough and the GC starts woriking too much and not freeing space.
+    
+    ![alt text](test-bench-images/heap.png "heap 10.000 iterations, 1.000 equations")
 
 4. ~~To use primitives instead of boxed types in combination with 4.~~
 
