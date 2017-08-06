@@ -84,7 +84,7 @@ The solutions are:
     
 6. Measures not related to the methods     
 
-    Increase heap size.
+    Increase heap size.  
     Use the ```quick-bench``` mode of Criterium to execute less times each method. Between the executions, the GC can't clear all the data of the previous execution and the heap is filled more. By executing less times less garbage will be on heap between the executions and the benchmark will complete before the heap blows.
 
 ### Regarding the parsing of the equations
