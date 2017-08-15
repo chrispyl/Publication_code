@@ -46,7 +46,7 @@ max-equation-size | Maximum terms of equations | Long
 
     java -jar sys-gen-0.1.0-standalone.jar system.txt 999 -5 5 0 10 2 100 4 3
 
-## Specification for linear systems
+## Specification for linear systems <a name="spec-linear-systems"></a>
 
 1. The range of the coefficients is defined by the user
 2. Coefficient ranges can be positive or negative numbers, lower bound inclusive upper bound exclusive, i.e [-5, 5) or [1, 5) or [-5, -1)
