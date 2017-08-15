@@ -63,7 +63,7 @@ max-equation-size | Maximum terms of equations | Long
 11. The precision of the coefficients is defined by the user
 12. The precision of the initial values is defined by the user
 13. In case of zero precision the decimal part of the doubles is cut by using the `floor` function
-14. In case of zero precision the results of rule 9 is being casted to long  
+14. In case of zero precision the result of rule 9 is cast to long  
   
 To calculate the pseudorandom values we use https://docs.oracle.com/javase/7/docs/api/java/util/Random.html#nextDouble(). To provide values in the specified range, we use the formula
     
