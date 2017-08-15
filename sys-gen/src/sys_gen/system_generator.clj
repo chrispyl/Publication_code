@@ -1,3 +1,6 @@
+(ns test-bench.system-generator
+	(:require [clojure.math.combinatorics :as combo]))			  
+
 (defn generator-state [seed]
 	(java.util.Random. seed))
 
@@ -218,7 +221,7 @@
 		 teams (create-teams variable-names number-of-equations number-of-teams)
 		 equation-size (define-equation-size max-equation-size number-of-equations teams)
 		 equations (create-equations linear? gen-state teams equation-size operators-for-linear weightLow weightHigh initial-value-low initial-value-high double-precision operators-for-non-linear non-linear-single-argument-functions non-linear-double-argument-functions)]
-		 equations))
+		 (vec equations))) ;put to vector in order to have random access and fully realize it
 
 
 		 
