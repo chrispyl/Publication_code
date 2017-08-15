@@ -69,7 +69,7 @@
 ;equation-variable-names - list or vector containing strings
 ;equation-size - long number	
 (defn which-variables-will-appear [equation-name previous-equation-name equation-variable-names equation-size]
-	(let [grab-bag-without-previous-equation-name (disj (set equation-variable-names) previous-equation-name)
+	(let [grab-bag-without-previous-equation-name (filter #(not= previous-equation-name %) equation-variable-names)
 		 variables-other-than-previous-equation-name (vec (take (dec equation-size) grab-bag-without-previous-equation-name))] ;if equation size is 1 it will be empty
 		(conj variables-other-than-previous-equation-name previous-equation-name)))
 
