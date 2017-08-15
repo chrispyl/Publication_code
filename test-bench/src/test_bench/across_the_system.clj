@@ -87,7 +87,7 @@
 	
 (defn partition-labour-across-the-system [iterations subsystems-map system-map fileValues]
 	(let [gos (doall ;without doall only 1 go starts
-					(map #(async/go (serial-integration iterations % fileValues)) (:independent subsystems-map)))
+					(map #(async/thread (serial-integration iterations % fileValues)) (:independent subsystems-map)))
 		  independent-result (apply merge (map #(async/<!! %) gos))
 		  dependent-result (dependent-integration iterations (:dependent subsystems-map) independent-result fileValues)
 		  merged-results (merge independent-result dependent-result)]

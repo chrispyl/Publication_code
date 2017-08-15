@@ -145,7 +145,7 @@
 	     independent-subsystems-of-subsystems (map #(create-subsystem-list % %2) independent-team-maps (subsystems-map :independent))
 		 dependent-subsystems (create-subsystem-list dependent-team-map (subsystems-map :dependent))
 		 gos (doall
-				(map #(async/go (across-the-method-integration iterations % %2 fileValues)) independent-subsystems-of-subsystems (subsystems-map :independent)))
+				(map #(async/thread (across-the-method-integration iterations % %2 fileValues)) independent-subsystems-of-subsystems (subsystems-map :independent)))
 		 fns-atoms-maps (doall 
 						 (map #(async/<!! %) gos))
 		 independent-results (apply merge (map #(create-result-map-for-across-the-method %) fns-atoms-maps))

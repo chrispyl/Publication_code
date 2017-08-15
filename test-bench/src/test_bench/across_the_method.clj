@@ -136,6 +136,6 @@
 (defn across-the-method-integration [iterations subsystems system-map fileValues]
 	(let [fns-atoms-map (create-fns-atoms-map system-map iterations fileValues)
 		 gos (doall 
-				(map #(async/go (calc-funcs-in-chunk iterations 1 fns-atoms-map %)) subsystems))]
+				(map #(async/thread (calc-funcs-in-chunk iterations 1 fns-atoms-map %)) subsystems))]
 		(create-result-map-for-across-the-method fns-atoms-map)))	
 		  
