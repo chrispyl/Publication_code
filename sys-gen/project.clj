@@ -1,5 +1,5 @@
 (defproject sys-gen "v0.1"
-  :description "FIXME: write description"
+  :description "FOODE system generator"
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}

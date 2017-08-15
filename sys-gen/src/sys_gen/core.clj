@@ -1,22 +1,27 @@
 (ns sys-gen.core
-  (:require [clojure.math.combinatorics :as combo])
-  (load "system_generator")
+  (:require [sys-gen.linear-system-generator :refer [linear-system-generator]])
   (:gen-class))
 
+;Writes equations to a file
+;file-name - string
+;equations - list or vector of strings  
 (defn write-to-file [file-name equations]	
 	(spit file-name (apply str (map prn-str equations))))
- 
+
+;Parses the input, calls the linear system generator, writes the result to a file	
 (defn -main [ & args]
-  (let [[file-name seed weightLow weightHigh initial-value-low initial-value-high double-precision number-of-equations number-of-teams linear? max-equation-size] args
-		seed (Integer/parseInt seed)
-		weightLow (Double/parseDouble weightLow)
-		weightHigh (Double/parseDouble weightHigh)
+  (let [[file-name seed weight-low weight-high initial-value-low initial-value-high double-precision number-of-equations number-of-teams max-equation-size] args
+
+		seed (Long/parseLong seed)
+		weight-low (Double/parseDouble weight-low)
+		weight-high (Double/parseDouble weight-high)
 		initial-value-low (Double/parseDouble initial-value-low)
 		initial-value-high (Double/parseDouble initial-value-high)
-		double-precision (Integer/parseInt double-precision)
-		number-of-equations (Integer/parseInt number-of-equations)
-		number-of-teams (Integer/parseInt number-of-teams)
-		linear? (if (= linear? "true") true false)
-		max-equation-size (Integer/parseInt max-equation-size)
-		equations (system-generator seed weightLow weightHigh initial-value-low initial-value-high double-precision number-of-equations number-of-teams linear? max-equation-size)]
+		double-precision (Long/parseLong double-precision)
+		number-of-equations (Long/parseLong number-of-equations)
+		number-of-teams (Long/parseLong number-of-teams)
+		max-equation-size (Long/parseLong max-equation-size)
+		
+		equations (linear-system-generator seed weight-low weight-high initial-value-low initial-value-high double-precision number-of-equations number-of-teams max-equation-size)]
+		
 		(write-to-file file-name equations)))
