@@ -5,13 +5,9 @@ A generator for systems of random First Order Ordinary Differential Equations.
 [Usage](#Usage)  
 [Arguments](#Arguments)  
 [Example](#Example)  
-[Linear-equation-generation](#Linear-equation-generation)  
-[Non-linear-equation-generation](#Non-linear-equation-generation)  
+[Specification for linear systems](#spec-linear-systems)  
 [Variable-names](#Variable-names)  
 [The role of Max-equation-size](#The-role-of-max-equation-size)  
-[Generation-limitations](#Generation-limitations)  
-[Generation-strategy-for-linear-equations](#Generation-strategy-for-linear-equations)  
-[Generation-strategy-for-non-linear-equations](#Generation-strategy-for-non-linear-equations)  
 [Something-worth-attention](#Something-worth-attention)  
 
 ## Usage <a name="Usage"></a>
@@ -29,39 +25,49 @@ A folder named **target** will be created. Inside the folder their is a file nam
 
 An execution using the jar looks like this
 
-    java -jar sys-gen-0.1.0-standalone.jar File-name Seed Weight-low Weight-high Initial-value-low Initial-value-high Double-precision Number-of-equations Number-of-teams Linear? Max-equation-size
+    java -jar sys-gen-0.1.0-standalone.jar file-name seed weight-low weight-high initial-value-low initial-value-high double-precision number-of-equations number-of-teams max-equation-size
 
 The arguments in the order they are taken are explained below
 
 **Argument** | **Description** | **Type**
 --- | --- | ---
-File-name | The file name where the results should be saved | String
-Seed | The seed for the random generator | Integer
-Weight-low | Minimum value of coefficients | Double
-Weight-high | Maximum value of coefficients | Double
-Initial-value-low | Minimum initial value of equations | Double
-Initial-value-high | Maximum initial value of equations | Double
-Double-precision | Decimal digits for coefficients | Integer
-Number-of-equations | Number of equations | Integer
-Number-of-teams | Number of teams | Integer
-Linear? | Linear or not | Boolean
-Max-equation-size | Maximum terms of equations | Integer
+file-name | The file name where the results should be saved | String
+seed | The seed for the random generator | Long
+weight-low | Minimum value of coefficients | Double
+weight-high | Maximum value of coefficients | Double
+initial-value-low | Minimum initial value of equations | Double
+initial-value-high | Maximum initial value of equations | Double
+double-precision | Decimal digits for coefficients | Long
+number-of-equations | Number of equations | Long
+number-of-teams | Number of teams | Long
+max-equation-size | Maximum terms of equations | Long
 
 ## Example <a name="Example"></a>
 
-    java -jar sys-gen-0.1.0-standalone.jar system.txt 999 -5 5 0 10 2 100 4 false 3
+    java -jar sys-gen-0.1.0-standalone.jar system.txt 999 -5 5 0 10 2 100 4 3
 
-## Linear equation generation <a name="Linear-equation-generation"></a>
+## Specification for linear systems
 
-The operators used for this type of generation are ```+, -, *, /```
-
-## Non linear equation generation <a name="Non-linear-equation-generation"></a> 
-
-The operators used for this type of generation are ```+, -, *, /, **```
-
-Also there are single argument functions ```abs, sqrt, exp, ln, sin, cos, atan```
-
-as well as double argument functions ```min, max```
+1. The range of the coefficients is defined by the user
+2. Coefficient ranges can be positive or negative numbers, lower bound inclusive upper bound exclusive, i.e [-5, 5) or [1, 5) or [-5, -1)
+3. The range of the initial values is defined by the user
+4. Initial value ranges can be positive or negative numbers, lower bound inclusive upper bound exclusive, i.e [-5, 5) or [1, 5) or [-5, -1)
+5. The operator between the terms is `+`
+6. Every term has a coefficient
+7. Between the coefficients and the variables the operator is `*`
+8. For the variable names appearing in the equations:  
+    * The last term of an equation contains the name of the previous equation in the system in order to create a chain of dependencies
+    * The rest appear in the equation in the order the do in the team, and always according to max equation size
+9. Coefficients are doubles
+10. Initial values are doubles
+11. The precision of the coefficients is defined by the user
+12. The precision of the initial values is defined by the user
+13. In case of zero precision the decimal part of the doubles is cut by using the `floor` function
+14. In case of zero precision the results of rule 9 is being casted to long  
+  
+To calculate the pseudorandom values we use https://docs.oracle.com/javase/7/docs/api/java/util/Random.html#nextDouble(). To provide values in the specified range, we use the formula
+    
+    random-value = lower-bound + (higher-bound - lower-bound) * value-produced-by-nextDouble
 
 ## Variable names <a name="Variable-names"></a>
 
@@ -116,24 +122,8 @@ The general pattern for a graph of this type is a chain as shown below with some
 
 ![alt text](sys-gen-images/with-maxequationsize.png "With 'Max-equation-size'")
 
-## Generation limitations <a name="Generation-limitations"></a>
-
-Due to randomness, the following rules had to be applied in order to secure that the generated equations are able to be simulated.
-
-* A variable cannot be part of the denominator of a fraction
-* The exponents must be positive
-* The inputs of functions that cannot take negative numbers must be positive
-* Functions like ```cos, tan``` with a narrow input domain cannot used as it is hard to guarantee that the input adheres to their domain
-
-## Generation strategy for linear equations <a name="Generation-strategy-for-linear-equations"></a>
-
-![alt text](sys-gen-images/linear.png "Generation strategy for linear equations")
-
-## Generation strategy for non linear equations <a name="Generation-strategy-for-non-linear-equations"></a>
-
-![alt text](sys-gen-images/non_linear.png "Generation strategy for non linear equations")
 
 ## Something worth attention <a name="Something-worth-attention"></a>
 
 In case of simulation, for a large number of iterations these systems will most probably lead to arithmetic underflows or overflows.
-To avoid this without using arithmetic libraries set the initial values to be zero.
+To avoid this set the initial values to zero.
