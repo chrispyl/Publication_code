@@ -62,19 +62,24 @@
 (defn update-progress-file [cores number-of-equations number-of-teams max-equation-size iterations]
 	(spit "progress.txt" (str cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)) :append true))	
 	
-(defn update-results-file [file-name cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-serial bench-result-across-the-method bench-result-across-the-system bench-result-for-mixed]
-	(spit file-name (str "Serial: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)
-	(spit file-name (str bench-result-serial (System/lineSeparator)) :append true)
-	(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true)
-	(spit file-name (str "Across the method: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)
-	(spit file-name (str bench-result-across-the-method (System/lineSeparator)) :append true)
-	(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true)
-	(spit file-name (str "Across the system: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)
-	(spit file-name (str bench-result-across-the-system (System/lineSeparator)) :append true)
-	(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true)
-	(spit file-name (str "Mixed: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " cores-for-mixed " cores for across the method, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)						
-	(spit file-name (str bench-result-for-mixed (System/lineSeparator)) :append true)
-	(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true))	
+(defn update-results-file [file-name result-origin cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed result]
+	(condp = result-origin
+		:serial 			 (do
+							(spit file-name (str "Serial: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)
+							(spit file-name (str result (System/lineSeparator)) :append true)
+							(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true))
+		:across-the-method (do
+							(spit file-name (str "Across the method: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)
+							(spit file-name (str result (System/lineSeparator)) :append true)
+							(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true))
+		:across-the-system (do
+							(spit file-name (str "Across the system: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)
+							(spit file-name (str result (System/lineSeparator)) :append true)
+							(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true))
+		:mixed			 (do
+							(spit file-name (str "Mixed: " cores " cores, " number-of-equations " equations, " number-of-teams " teams, " max-equation-size " max-equation-size, " cores-for-mixed " cores for across the method, " iterations " iterations" (System/lineSeparator)(System/lineSeparator)) :append true)						
+							(spit file-name (str result (System/lineSeparator)) :append true)
+							(spit file-name (str "-------------------------------------------------------------------------------------------------------------------------------------------" (System/lineSeparator)) :append true))	))
 
 (defn parse-arrays [core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array]
 	(let [core-vector (mapv #(Integer/parseInt %) (str/split core-array #","))
@@ -116,21 +121,27 @@
 						 bench-result-serial (bench-serial-memo iterations system-map {})
 						 _ (write-done "serial")
 						 
+						 _ (update-results-file file-name :serial cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-serial)
+						 
 						 _ (write-calculating "across-the-method")
 						 subsystems (prepare-across-the-method-memo iterations system-map cores {})
 						 bench-result-across-the-method (bench-across-the-method-memo iterations subsystems system-map {})
 						 _ (write-done "across-the-method")
+						 
+						 _ (update-results-file file-name :across-the-method cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-across-the-method)
 						 
 						 _ (write-calculating "across-the-system")
 						 subsystems-map (prepare-across-the-system-memo iterations system-map cores {})
 						 bench-result-across-the-system (bench-across-the-system-memo iterations subsystems-map system-map {})
 						 _ (write-done "across-the-system")
 						 
-						 _ (write-calculating "mixed")
-						 bench-result-for-mixed (bench-mixed-memo iterations subsystems-map cores-for-mixed {}) 	;uses the subsystems-map created for across the system					
-						 _ (write-done "mixed")] 
+						 _ (update-results-file file-name :across-the-system cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-across-the-system)
 						 
-						(update-results-file file-name cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-serial bench-result-across-the-method bench-result-across-the-system bench-result-for-mixed)
+						 _ (write-calculating "mixed")
+						 bench-result-for-mixed (bench-mixed-memo iterations subsystems-map cores-for-mixed {}) ;uses the subsystems-map created for across the system					
+						 _ (write-done "mixed")
+						 
+						 _ (update-results-file file-name :mixed cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-for-mixed)] 
 				))))))
 		
 	
