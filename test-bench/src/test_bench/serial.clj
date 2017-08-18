@@ -14,32 +14,31 @@
 	(zipmap (keys system-map) (map :init-val (vals system-map))))
 
 (defn create-value-map [system-map init-vals-map]
-	(transient (zipmap (keys system-map) (map #(transient [%]) (vals init-vals-map))))
-		(transient (zipmap (keys system-map) (map #(transient [%]) (vals init-vals-map)))))
+	(zipmap (keys system-map) (map #(vector %) (vals init-vals-map))))
 
 ;returns a vector of vectors, each one containing the parameters of a function
 (defn create-params-vector 
 	([system-map]
-		(mapv :params (vals system-map)))
+		(map :params (vals system-map)))
 	([system-map ordered-simple-eqs]
-		(mapv :params (map #(% system-map) ordered-simple-eqs))))	
+		(map :params (map #(% system-map) ordered-simple-eqs))))	
 	
 ;returns a vector of functions
 (defn create-fn-vector 
 	([system-map]
-		(mapv :func (vals system-map)))
+		(map :func (vals system-map)))
 	([system-map ordered-simple-eqs]
-		(mapv :func (map #(% system-map) ordered-simple-eqs))))				
+		(map :func (map #(% system-map) ordered-simple-eqs))))				
 	
 (defn calc-func 
 	([iter func-name value-map params-subvector func]
 		(func (zipmap params-subvector (map #((% value-map) iter) params-subvector))))
 	([iter func-name value-map outer-dependencies-produced-values-map params-subvector func]
 		(func (zipmap params-subvector (map 
-											#(if-let [v (% value-map)]
-												(v iter)
-												((% outer-dependencies-produced-values-map) iter))
-										params-subvector))))) 	
+										#(if-let [v (% value-map)]
+											(v iter)
+											((% outer-dependencies-produced-values-map) iter))
+									params-subvector))))) 	
 
 (defn euler-method 
 	([iter step value-map func-name params-subvector func]
@@ -51,7 +50,7 @@
 	(let  [whole-system-keys (keys system-map)
 		   init-vals-map (create-init-vals-map system-map)
 		   value-map (create-value-map system-map init-vals-map) ;this is a TRANSIENT map with TRANSIENT values
-		   value-map (reduce #(assoc! % (first %2) (transient (second %2))) value-map fileValues)
+		   value-map (reduce #(assoc % (first %2)  (second %2)) value-map fileValues)
 		   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   simple-eqs-map (remove-elements true system-map)
 		   ordered-simple-eqs (topol-sort simple-eqs-map)
@@ -68,13 +67,11 @@
 									(let [value-map-after-diffs-assoced (loop [ks system-map-keys m vm pv params-vector fv fn-vector]
 																			(if (empty? ks)
 																				m
-																				(recur (next ks) (assoc! m (first ks) (conj! ((first ks) m) (euler-method iter 1 m (first ks) (first pv) (first fv)))) (next pv) (next fv))))									
+																				(recur (next ks) (assoc m (first ks) (conj ((first ks) m) (euler-method iter 1 m (first ks) (first pv) (first fv)))) (next pv) (next fv))))									
 										  value-map-after-eqs-assoced (loop [ks ordered-simple-eqs m value-map-after-diffs-assoced params-vec simple-eqs-params-vector fn-vec simple-eqs-fn-vector]
 																			(if (empty? ks)
 																				m
-																				(recur (next ks) (assoc! m (first ks) (conj! ((first ks) m) (calc-func (inc iter) (first ks) m (first params-vec) (first fn-vec)))) (next params-vec) (next fn-vec))))]
+																				(recur (next ks) (assoc m (first ks) (conj ((first ks) m) (calc-func (inc iter) (first ks) m (first params-vec) (first fn-vec)))) (next params-vec) (next fn-vec))))]
 									(recur (inc iter) value-map-after-eqs-assoced))
-									vm))
-			pers-value-map (persistent! final-value-map)
-			pers-vectors (map #(persistent! %) (vals pers-value-map))]
-		(zipmap (keys pers-value-map) pers-vectors)))
+									vm))]
+		final-value-map))

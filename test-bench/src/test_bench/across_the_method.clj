@@ -1,7 +1,7 @@
 (ns test-bench.across-the-method
 	(:require [test-bench.teamming :refer :all]
 			 [test-bench.topo-sort :refer :all]
-			 [clojure.core.async :as async]))
+			 [test-bench.serial :refer [remove-elements]]))
 
 (defn repeatedly*
   [coll n f]
@@ -14,39 +14,37 @@
       (if (>= idx n)
         (persistent! v)
         (recur (conj! v (f)) (inc idx))))))
-
-(defn remove-elements [differential? system-map]
-	(loop [ks (keys system-map) m system-map]
-		(if ks
-			(recur (next ks) (if (= (:differential ((first ks) m)) differential?)
-								(dissoc m (first ks))
-								m))
-			m)))	
 		
 (defn create-subsystem-list [team-map system-map]
 	(let [subsystems (for [team team-map]
 					  (create-subsystem (flatten team) system-map))]
 		subsystems))		  
 
-(defn create-value-vec [initial-value iterations fileValues equation-name-as-key]
+(defn create-value-vec [initial-value iterations equation-name-as-key]
   (let [v (repeatedly* [] (+ iterations 1) promise)]
 	   (deliver (v 0) initial-value)
-		(if (fileValues equation-name-as-key)
-			(loop [position 1]
-				(if (= position iterations)
-					v
-					(do
-						(deliver (v position) ((fileValues equation-name-as-key) position))
-						(recur  (inc position)))))
-			v)))		
-		
-(defn create-fns-atoms-map [system-map iterations fileValues]
+		v))					
+			
+(defn create-fns-atoms-map [system-map iterations]
 	(zipmap 
 		(keys system-map) 
 		(map 
-			#(atom (create-value-vec ((system-map %) :init-val) iterations fileValues %))
+			#(atom (create-value-vec ((system-map %) :init-val) iterations %))
 			(keys system-map))))		
 
+(defn map-to-atom-with-map-of-promises [m]
+	(let [num-of-elements (-> m vals first count)
+		 v (repeatedly* [] num-of-elements promise)]
+		 (doall
+			(map #(deliver (v %2) %) (first (vals m)) (range num-of-elements)))
+		{(-> m keys first) (atom v)}))
+			
+(defn put-fileValues-to-fns-atoms-map [fns-atoms-map fileValues]
+	(loop [m fns-atoms-map ks (keys fileValues)]
+		(if (empty? ks)
+			m
+			(recur (merge m (map-to-atom-with-map-of-promises {(first ks) (fileValues (first ks))})) (rest ks)))))			
+			
 (defn where-to-pull-params [subsystem fns-atoms-map]
 	(for [subsystem-key (keys subsystem)]
 		(mapv #(fns-atoms-map %) ((subsystem subsystem-key) :params))))	
@@ -88,7 +86,7 @@
 		   system-map (remove-elements false system-map)		;this system map has the simple equations removed
 	   
 		   ;keys
-		   system-map-keys (keys system-map)                ;as a result of the redifined system map, these keys are only from dif equations
+		   system-map-keys (keys system-map)                ;as a result of the redefined system map, these keys are only from dif equations
 		   simple-eqs-map-keys ordered-simple-eqs
 		   ;functions
 		   dif-eqs-functions (get-functions system-map)
@@ -107,14 +105,14 @@
 		   simple-eqs-store (where-to-store simple-eqs-map fns-atoms-map)
 		   calculations (loop [iteration 0]
 							(when-not (= iteration iterations)
-								(doall
+								(dorun
 									(map #(update-atom iteration 1 % %2 %3 %4 %5)
 										dif-eqs-param-names
 										diff-eqs-pull
 										dif-eqs-functions
 										dif-eqs-atoms
 										diff-eqs-store))
-								(doall	
+								(dorun	
 									(map #(update-atom iteration 1 % %2 %3 %4 %5)
 										simple-eqs-param-names
 										simple-eqs-pull
@@ -134,8 +132,9 @@
 		
 ;to system map exei ta panta, keys einia ta function names  
 (defn across-the-method-integration [iterations subsystems system-map fileValues]
-	(let [fns-atoms-map (create-fns-atoms-map system-map iterations fileValues)
-		 gos (doall 
-				(map #(async/thread (calc-funcs-in-chunk iterations 1 fns-atoms-map %)) subsystems))]
+	(let [fns-atoms-map (create-fns-atoms-map system-map iterations)
+		 fns-atoms-map (put-fileValues-to-fns-atoms-map fns-atoms-map fileValues)
+		 futures (doall 
+					(map #(future (calc-funcs-in-chunk iterations 1 fns-atoms-map %)) subsystems))]
 		(create-result-map-for-across-the-method fns-atoms-map)))	
 		  

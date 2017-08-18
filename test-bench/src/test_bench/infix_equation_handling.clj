@@ -5,8 +5,17 @@
 			  [infix.macros :refer [from-string infix]]
 			  [clojure.string :as str]
 			  [clojure.set :as clset]
-			  [clojure.core.async :as async]))			  
+			  [test-bench.teamming :refer [work-sharing]]))			  
 
+
+(defn parallel-group-by [f strings]
+	(let [cores (.availableProcessors (Runtime/getRuntime))
+		 groups (work-sharing strings cores)
+		 futures (doall
+					(map #(future (group-by f %)) groups))
+		 group-result (apply merge-with #(apply conj % %2) (map deref futures))]
+		group-result))
+			  
 (defn is-operator? [s]
 	(if (empty? (filter #(= s %) ["=" "+" "-" "*" "/" "abs" "signum" "**" "exp" "log" "e" "ð" "sqrt" "fact" "sin" "cos" "tan" "asin" "acos" "atan" "sinh" "cosh" "tanh" "min" "max" "ln" "floor"])) 
 		false true))
@@ -87,7 +96,7 @@
 									(if (not (empty? substs))
 										(recur (str/replace s (re-pattern (str "\\b" (substitute-map (first substs)) "\\b")) (first substs)) (rest substs))
 										s)))
-		  inverted-substitute-map (clojure.set/map-invert substitute-map) ;substitute map has keys @@@@@@@ and values the names. We need to invert in order to extract right after the keys who refer to constants
+		  inverted-substitute-map (clset/map-invert substitute-map) ;substitute map has keys @@@@@@@ and values the names. We need to invert in order to extract right after the keys who refer to constants
 		  keys-whose-value-must-change (map #(inverted-substitute-map %) (keys constants-map)) ;the result is a list of @@@@  @@@@@@@@@@@ @@   
 		  altered-substitute-map  (loop [k keys-whose-value-must-change updated-map substitute-map] ;the altered-substitute-map is same as the substitute-map but wherever there are constant names has their respective values
 									(if (empty? k)
@@ -101,7 +110,7 @@
 		  substitution-complete))				  
 		  
 (defn replace-constants [strings]
-	(let [group-result (group-by is-constant? strings)
+	(let [group-result (parallel-group-by is-constant? strings)
 		  eqs (group-result false)
 		  constants (group-result true)
 		  names (map #(first (str/split % #"=")) strings)
@@ -143,19 +152,19 @@
 		  groups (if (>= (quot (count equations) cores) 1)
 									(partition-all cores equations)
 									(partition-all (count equations) equations))
-		  gos	(doall 
-				  (map #(async/go (apply merge (map create-function-map %))) groups))
-		  diff-eqs-map	(apply merge (map #(async/<!! %) gos))]
-		  diff-eqs-map))		
-		
+		  futures	(doall 
+						(map #(future (apply merge (map create-function-map %))) groups))
+		  diff-eqs-map	(apply merge (map deref futures))]
+		  diff-eqs-map))				  
+		  
 ;input is a vector or sequence		  
 (defn create-system-map [strings fileValues]
-	(let [removed-empty-strings (remove-empty-strings strings)
+	(let [removed-empty-strings (doall (remove-empty-strings strings))
 		  no-spaces (doall (remove-spaces removed-empty-strings))
-		  constants-replaced (replace-constants no-spaces) ;does not include constants
-		  care-negs-replaced (care-of-neg-signs constants-replaced)
-		  care-division (care-of-division care-negs-replaced)
-		  group-result (group-by #(str/includes? % "#") care-division)
+		  ;constants-replaced (replace-constants no-spaces) ;does not include constants
+		  care-negs-replaced (doall (care-of-neg-signs no-spaces))
+		  care-division (doall (care-of-division care-negs-replaced))
+		  group-result (parallel-group-by (fn [s] (str/includes? s "#")) care-division) ;for big systems the program will take its time to proceed further down from this line because care-negs is lazyseq of lazyseqs and all are realized here
 		  diff-eqs (group-result true)
 		  eqs (group-result false)
 		  diff-eqs-map (strings-to-function-map-parallel diff-eqs)
