@@ -8,6 +8,7 @@
 			  [test-bench.serial :refer [serial-integration]]
 			  [test-bench.custom-bench-results :refer [bench-with-result]]
 			  [test-bench.mixed :refer [partition-labour-mixed]]
+			  [test-bench.stats :refer [std-deviation]]
 			  [clojure.string :as str])
 	(:gen-class))	
 	
@@ -25,21 +26,28 @@
 (defn remove-garbage [bench-result-map]
 	(dissoc bench-result-map :results :samples :input-arguments))		
 
+(defn add-std-deviation [bench-result-map]
+	(assoc bench-result-map :std-deviation (std-deviation (first (bench-result-map :variance)))))	
+	
 (defn bench-serial [iterations system-map fileValues]
-	(remove-garbage 
-		(bench-with-result (serial-integration iterations system-map {}))))	
+	(-> (bench-with-result (serial-integration iterations system-map {}))
+		remove-garbage
+		add-std-deviation))	
 		
 (defn bench-across-the-method [iterations subsystems system-map fileValues]
-	(remove-garbage
-		(bench-with-result (across-the-method-integration iterations subsystems system-map {}))))
+	(-> (bench-with-result (across-the-method-integration iterations subsystems system-map {}))
+		remove-garbage
+		add-std-deviation))
 
 (defn bench-across-the-system [iterations subsystems-map system-map fileValues]
-	(remove-garbage 
-		(bench-with-result (partition-labour-across-the-system iterations subsystems-map system-map fileValues))))
+	(-> (bench-with-result (partition-labour-across-the-system iterations subsystems-map system-map fileValues))
+		remove-garbage
+		add-std-deviation))
 
 (defn bench-mixed [iterations subsystems-map cores-for-mixed fileValues]
-	(remove-garbage
-		(bench-with-result (partition-labour-mixed iterations subsystems-map cores-for-mixed fileValues))))		
+	(-> (bench-with-result (partition-labour-mixed iterations subsystems-map cores-for-mixed fileValues))
+		remove-garbage
+		add-std-deviation))		
 
 ;benchmark memoizations		
 (def bench-serial-memo (memoize bench-serial))
