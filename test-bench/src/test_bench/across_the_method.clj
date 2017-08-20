@@ -2,19 +2,8 @@
 	(:require [test-bench.teamming :refer :all]
 			 [test-bench.topo-sort :refer :all]
 			 [test-bench.serial :refer [remove-elements]]
+			 [test-bench.helper-functions :refer [repeatedly*]]
 			 [promissum.core :as promissum]))
-
-(defn repeatedly*
-  [coll n f]
-  (if-not (instance? clojure.lang.IEditableCollection coll)
-    (loop [v coll idx 0]
-      (if (>= idx n)
-        v
-        (recur (conj v (f)) (inc idx))))
-    (loop [v (transient coll) idx 0]
-      (if (>= idx n)
-        (persistent! v)
-        (recur (conj! v (f)) (inc idx))))))
 		
 (defn create-subsystem-list [team-map system-map]
 	(let [subsystems (for [team team-map]
@@ -112,8 +101,7 @@
 										diff-eqs-pull
 										dif-eqs-functions
 										dif-eqs-atoms
-										diff-eqs-store
-))
+										diff-eqs-store))
 								(dorun	
 									(map #(update-atom iteration 1 % %2 %3 %4 %5)
 									

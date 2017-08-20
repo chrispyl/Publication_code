@@ -3,20 +3,10 @@
 			 [test-bench.topo-sort :refer :all]
 			 [test-bench.serial :refer [remove-elements]]
 			 [test-bench.across-the-method :refer [calc-funcs-in-chunk
-											  repeatedly*
 											  create-subsystem-list
 											  create-value-vec
 											  create-fns-atoms-map
-											  map-to-atom-with-map-of-promises
 											  put-fileValues-to-fns-atoms-map
-											  where-to-pull-params
-											  where-to-store
-											  get-functions
-											  get-param-names-as-keys
-											  get-equation-atoms
-											  calc-new-value
-											  euler-method
-											  update-atom
 											  create-result-map-for-across-the-method]]))		
  
 (defn across-the-method-integration [iterations subsystems system-map fileValues]
