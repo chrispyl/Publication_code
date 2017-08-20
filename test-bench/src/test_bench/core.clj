@@ -9,7 +9,8 @@
 			  [test-bench.custom-bench-results :refer [bench-with-result]]
 			  [test-bench.mixed :refer [partition-labour-mixed]]
 			  [test-bench.stats :refer [std-deviation]]
-			  [clojure.string :as str])
+			  [clojure.string :as str]
+			  [promissum.core :as promissum])
 	(:gen-class))	
 	
 	

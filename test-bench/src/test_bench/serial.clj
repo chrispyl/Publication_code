@@ -49,8 +49,8 @@
 (defn serial-integration [iterations system-map fileValues]
 	(let  [whole-system-keys (keys system-map)
 		   init-vals-map (create-init-vals-map system-map)
-		   value-map (create-value-map system-map init-vals-map) ;this is a TRANSIENT map with TRANSIENT values
-		   value-map (reduce #(assoc % (first %2)  (second %2)) value-map fileValues)
+		   value-map (transient (create-value-map system-map init-vals-map))
+		   value-map (reduce #(assoc! % (first %2)  (second %2)) value-map fileValues)
 		   ;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;;
 		   simple-eqs-map (remove-elements true system-map)
 		   ordered-simple-eqs (topol-sort simple-eqs-map)
@@ -67,11 +67,11 @@
 									(let [value-map-after-diffs-assoced (loop [ks system-map-keys m vm pv params-vector fv fn-vector]
 																			(if (empty? ks)
 																				m
-																				(recur (next ks) (assoc m (first ks) (conj ((first ks) m) (euler-method iter 1 m (first ks) (first pv) (first fv)))) (next pv) (next fv))))									
+																				(recur (rest ks) (assoc! m (first ks) (conj ((first ks) m) (euler-method iter 1 m (first ks) (first pv) (first fv)))) (rest pv) (rest fv))))									
 										  value-map-after-eqs-assoced (loop [ks ordered-simple-eqs m value-map-after-diffs-assoced params-vec simple-eqs-params-vector fn-vec simple-eqs-fn-vector]
 																			(if (empty? ks)
 																				m
-																				(recur (next ks) (assoc m (first ks) (conj ((first ks) m) (calc-func (inc iter) (first ks) m (first params-vec) (first fn-vec)))) (next params-vec) (next fn-vec))))]
+																				(recur (rest ks) (assoc! m (first ks) (conj ((first ks) m) (calc-func (inc iter) (first ks) m (first params-vec) (first fn-vec)))) (rest params-vec) (rest fn-vec))))]
 									(recur (inc iter) value-map-after-eqs-assoced))
 									vm))]
-		final-value-map))
+		(persistent! final-value-map)))

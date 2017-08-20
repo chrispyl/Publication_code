@@ -1,7 +1,8 @@
 (ns test-bench.across-the-method
 	(:require [test-bench.teamming :refer :all]
 			 [test-bench.topo-sort :refer :all]
-			 [test-bench.serial :refer [remove-elements]]))
+			 [test-bench.serial :refer [remove-elements]]
+			 [promissum.core :as promissum]))
 
 (defn repeatedly*
   [coll n f]
@@ -21,8 +22,8 @@
 		subsystems))		  
 
 (defn create-value-vec [initial-value iterations equation-name-as-key]
-  (let [v (repeatedly* [] (+ iterations 1) promise)]
-	   (deliver (v 0) initial-value)
+  (let [v (repeatedly* [] (+ iterations 1) promissum/promise)]
+	   (promissum/deliver (v 0) initial-value)
 		v))					
 			
 (defn create-fns-atoms-map [system-map iterations]
@@ -34,9 +35,9 @@
 
 (defn map-to-atom-with-map-of-promises [m]
 	(let [num-of-elements (-> m vals first count)
-		 v (repeatedly* [] num-of-elements promise)]
+		 v (repeatedly* [] num-of-elements promissum/promise)]
 		 (doall
-			(map #(deliver (v %2) %) (first (vals m)) (range num-of-elements)))
+			(map #(promissum/deliver (v %2) %) (first (vals m)) (range num-of-elements)))
 		{(-> m keys first) (atom v)}))
 			
 (defn put-fileValues-to-fns-atoms-map [fns-atoms-map fileValues]
@@ -69,7 +70,7 @@
 (defn calc-new-value [iteration function param-names pull-from]
 	(function (zipmap param-names (map #(deref ((deref %) iteration)) pull-from)))) ;must make a map here of params matched to previous step parameters to values
 	
-;function is an executable funciton created by infix		
+;function is an executable function created by infix		
 (defn euler-method [iteration step  function equation-atom param-names pull-from]
 	(+ @(@equation-atom iteration) (* 1 (calc-new-value iteration function param-names pull-from))))		
 
@@ -78,7 +79,7 @@
 ;pull-from is a list of atoms containing the atoms from where the equation will pull its values
 ;store-at is an atom where the equation will store its values		
 (defn update-atom [iteration step param-names pull-from function equation-atom store-at]
-	(swap! store-at assoc (+ iteration 1) (deliver (@store-at (+ iteration 1)) (euler-method iteration 1 function equation-atom param-names pull-from))))
+	(promissum/deliver (@store-at (+ iteration 1)) (euler-method iteration 1 function equation-atom param-names pull-from)))
 		
 (defn calc-funcs-in-chunk [iterations step fns-atoms-map system-map]
 	(let  [simple-eqs-map (remove-elements true system-map)
@@ -111,9 +112,11 @@
 										diff-eqs-pull
 										dif-eqs-functions
 										dif-eqs-atoms
-										diff-eqs-store))
+										diff-eqs-store
+))
 								(dorun	
 									(map #(update-atom iteration 1 % %2 %3 %4 %5)
+									
 										simple-eqs-param-names
 										simple-eqs-pull
 										simple-eqs-functions

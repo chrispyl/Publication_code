@@ -5,9 +5,11 @@
             :url "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.8.0"]
 				[rm-hull/infix "0.2.10"]
-				[org.clojure/core.async "0.2.395"]
 				[criterium "0.4.4"]
-				[org.clojure/math.combinatorics "0.1.4"]]
+				[org.clojure/math.combinatorics "0.1.4"]
+				[funcool/promissum "0.3.3"]]
   :main ^:skip-aot test-bench.core
   :target-path "target/%s"
-  :profiles {:uberjar {:aot :all}})
+  :profiles {:uberjar {:aot :all}}
+  :jvm-opts ["-Xmx6G"
+		    "-Xms6G"] )
