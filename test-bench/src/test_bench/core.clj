@@ -57,8 +57,6 @@
 (def bench-mixed-memo (memoize bench-mixed))
 
 ;other function memoizations
-(def system-generator-memo (memoize system-generator))
-(def create-system-map-memo (memoize create-system-map))
 (def prepare-across-the-method-memo (memoize prepare-across-the-method))
 (def prepare-across-the-system-memo (memoize prepare-across-the-system))
 
@@ -123,8 +121,8 @@
 				(do
 					(update-progress-file cores number-of-equations number-of-teams max-equation-size iterations)
 					
-					(let [system (system-generator-memo seed weightLow weightHigh initial-value-low initial-value-high double-precision number-of-equations number-of-teams linear? max-equation-size)
-						 system-map (create-system-map-memo system {})
+					(let [system (system-generator seed weightLow weightHigh initial-value-low initial-value-high double-precision number-of-equations number-of-teams linear? max-equation-size)
+						 system-map (create-system-map system {})
 						 
 						 _ (write-calculating "serial")
 						 bench-result-serial (bench-serial-memo iterations system-map {})
