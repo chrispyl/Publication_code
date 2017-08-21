@@ -99,19 +99,18 @@
 		 iterations-vector (mapv #(Integer/parseInt %) (str/split iterations-array #","))]
 		[core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector]))	
 
-(defn parse-system-generator-arguments [seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?]
+(defn parse-system-generator-arguments [seed weightLow weightHigh initial-value-low initial-value-high double-precision]
 	(let [seed (Integer/parseInt seed)
 		 weightLow (Double/parseDouble weightLow)
 		 weightHigh (Double/parseDouble weightHigh)
 		 initial-value-low (Double/parseDouble initial-value-low)
 		 initial-value-high (Double/parseDouble initial-value-high)
-		 double-precision (Integer/parseInt double-precision)
-		 linear? (if (= linear? "true") true false)]
+		 double-precision (Integer/parseInt double-precision)]
 		[seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?]))		
 		
-(defn -main [file-name core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?]
+(defn -main [file-name core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array seed weightLow weightHigh initial-value-low initial-value-high double-precision]
 	(let [[core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector] (parse-arrays core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array)
-		 [seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?] (parse-system-generator-arguments seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?)]
+		 [seed weightLow weightHigh initial-value-low initial-value-high double-precision] (parse-system-generator-arguments seed weightLow weightHigh initial-value-low initial-value-high double-precision)]
 		 
 		 (dorun
 		   (for [number-of-equations equation-vector
