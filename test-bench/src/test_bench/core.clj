@@ -3,7 +3,7 @@
 			  [test-bench.across-the-method :refer [across-the-method-integration create-subsystem-list]]
 			  [test-bench.infix-equation-handling :refer [create-system-map]]
 			  [test-bench.across-the-system :refer [partition-labour-across-the-system]]
-			  [test-bench.system-generator :refer [system-generator]]
+			  [test-bench.linear-system-generator :refer [linear-system-generator]]
 			  [test-bench.teamming :refer [create-team-map create-subsystem-map work-sharing]]
 			  [test-bench.serial :refer [serial-integration]]
 			  [test-bench.benchmark :refer [bench-with-result wrap-in-do-nil]]
@@ -123,7 +123,7 @@
 				(do
 					(update-progress-file cores number-of-equations number-of-teams max-equation-size iterations)
 					
-					(let [system (system-generator seed weightLow weightHigh initial-value-low initial-value-high double-precision number-of-equations number-of-teams linear? max-equation-size)
+					(let [system (linear-system-generator seed weightLow weightHigh initial-value-low initial-value-high double-precision number-of-equations number-of-teams max-equation-size)
 						 system-map (create-system-map system {})
 						 
 						 _ (write-calculating "serial")
