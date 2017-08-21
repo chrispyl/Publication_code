@@ -11,5 +11,5 @@
   :main ^:skip-aot test-bench.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
-  :jvm-opts ["-Xmx6G"
-		    "-Xms6G"] )
+  :jvm-opts ["-Xmx12G"
+		    "-Xms12G"] )

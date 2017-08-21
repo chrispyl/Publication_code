@@ -6,10 +6,11 @@
 			  [test-bench.system-generator :refer [system-generator]]
 			  [test-bench.teamming :refer [create-team-map create-subsystem-map work-sharing]]
 			  [test-bench.serial :refer [serial-integration]]
-			  [test-bench.custom-bench-results :refer [bench-with-result]]
+			  [test-bench.benchmark :refer [bench-with-result wrap-in-do-nil]]
 			  [test-bench.mixed :refer [partition-labour-mixed]]
 			  [test-bench.stats :refer [std-deviation]]
 			  [clojure.string :as str]
+			  [test-bench.test-systems :refer :all]
 			  [promissum.core :as promissum])
 	(:gen-class))	
 	
@@ -29,26 +30,27 @@
 
 (defn add-std-deviation [bench-result-map]
 	(assoc bench-result-map :std-deviation (std-deviation (first (bench-result-map :variance)))))	
-	
-(defn bench-serial [iterations system-map fileValues]
-	(-> (bench-with-result (serial-integration iterations system-map {}))
+
+(defn process-result-map [result-map]
+	(-> result-map
 		remove-garbage
 		add-std-deviation))	
+	
+(defn bench-serial [iterations system-map fileValues]
+	(-> (bench-with-result (wrap-in-do-nil (serial-integration iterations system-map fileValues)))
+		process-result-map))	
 		
 (defn bench-across-the-method [iterations subsystems system-map fileValues]
-	(-> (bench-with-result (across-the-method-integration iterations subsystems system-map {}))
-		remove-garbage
-		add-std-deviation))
+	(-> (bench-with-result (wrap-in-do-nil (across-the-method-integration iterations subsystems system-map fileValues)))
+		process-result-map))
 
 (defn bench-across-the-system [iterations subsystems-map system-map fileValues]
-	(-> (bench-with-result (partition-labour-across-the-system iterations subsystems-map system-map fileValues))
-		remove-garbage
-		add-std-deviation))
+	(-> (bench-with-result (wrap-in-do-nil (partition-labour-across-the-system iterations subsystems-map system-map fileValues)))
+		process-result-map))
 
 (defn bench-mixed [iterations subsystems-map cores-for-mixed fileValues]
-	(-> (bench-with-result (partition-labour-mixed iterations subsystems-map cores-for-mixed fileValues))
-		remove-garbage
-		add-std-deviation))		
+	(-> (bench-with-result (wrap-in-do-nil (partition-labour-mixed iterations subsystems-map cores-for-mixed fileValues)))
+		process-result-map))		
 
 ;benchmark memoizations		
 (def bench-serial-memo (memoize bench-serial))
@@ -97,7 +99,7 @@
 		 iterations-vector (mapv #(Integer/parseInt %) (str/split iterations-array #","))]
 		[core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector]))	
 
-(defn parse-rest-of-system-generator-arguments [seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?]
+(defn parse-system-generator-arguments [seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?]
 	(let [seed (Integer/parseInt seed)
 		 weightLow (Double/parseDouble weightLow)
 		 weightHigh (Double/parseDouble weightHigh)
@@ -109,7 +111,7 @@
 		
 (defn -main [file-name core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?]
 	(let [[core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector] (parse-arrays core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array)
-		 [seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?] (parse-rest-of-system-generator-arguments seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?)]
+		 [seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?] (parse-system-generator-arguments seed weightLow weightHigh initial-value-low initial-value-high double-precision linear?)]
 		 
 		 (dorun
 		   (for [number-of-equations equation-vector
