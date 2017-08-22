@@ -3,109 +3,14 @@
 The test-bench for our methods.  
 The methods included are serial, across the method, across the system and mixed.  
 The results are saved to a file chosen by the user.  
-During the tests, a file named *report.txt* is created which contains the test parameters being tested at that moment.
+During the tests, a file named *progress.txt* is created which contains the test parameters being tested at that moment and other information.
+At the end of the tests, an email with the results attached is sent to notify that the tests have ended.
 
 [Problems](#Problems)  
 [Usage](#Usage)  
 [Arguments](#Arguments)  
 [Example](#Example)  
 [Benchmarking once](#Benchmarking_once)
-
-## Problems <a name="Problems"></a>
-
-### Regarding the maximum iterations-equations
-
-For higher amounts of equations and iterations we get
-
-    java.lang.OutOfMemoryError: GC overhead limit exceeded
-    
-Generally, this means that the garbage collector runs for 98% of the CPU time. This can be due to head retention of some sequence which takes up a lot of heap, as well as many large objects being created and left behind
-for the GC at a very fast rate. In both cases the GC is triggered in order to free heap space but it is unable to do so and the loop continues.
-
-In our case, the reason is that during the integration we store the previously produced values in collections. In Clojure, when primitives are put into collections they are
-auto-boxed. This means that they are wrapped into objects and end up to the heap. 
-
-Trying several flags for the JVM which among others increase the available heap size has no effect and only makes the program run for a few more minutes.
-
-    -Xmx4g
-    -server
-    -d64
-    -da
-    -dsa
-    -XX:+UseConcMarkSweepGC
-    -XX:+UseParNewGC
-    -XX:ParallelCMSThreads=4
-    -XX:+ExplicitGCInvokesConcurrent
-    -XX:+CMSParallelRemarkEnabled
-    -XX:-CMSIncrementalPacing
-    -XX:+UseCMSInitiatingOccupancyOnly
-    -XX:CMSIncrementalDutyCycle=100
-    -XX:CMSInitiatingOccupancyFraction=90
-    -XX:CMSIncrementalSafetyFactor=10
-    -XX:+CMSClassUnloadingEnabled"
-    -XX:+DoEscapeAnalysis
-    
-To trigger this error in a machine with 4Gb ram (where the JVM automatically puts 1Gb heap) we can try to produce 1.000.000 elements (doubles), e.g 10.000 iterations and 100 equations.
-It is believed that Criterium has something to do with it (maybe can't trigger the GC among the runs) because when running the methods without Criterium with the 
-previous and a bit higher iterations, the error doesn't appear. Of course for higher numbers such 10.000.000 elements, e.g 10.000 iterations and 1.000 equations it appears again.
-
-The solutions are:
-
-1. To not include in the tests such high inputs and **continue** using Criterium
-
-    This is too limiting as we will have to stay **under** the
-    
-        10.000 iterations - 100 equations
-        or
-        1.000 iterations - 1.000 equations
-
-2. To include a bit higher inputs -> **remove** criterium -> benchmark with ```time```? (can't compare its credibility with Criterium)
-
-    We can't achieve the same reliable results without Criterium. Also, the benefit would be just another order of magnitude. For example, the combination of
-    
-        10.000 iterations - 100 equations 
-        
-    would be possible but not much after that.    
-
-3. To remove the transients (which easily lead to head retention) at the expense of execution time from the methods who use them, and **maybe continue** using Criterium
-
-    While dealing with transients many intermediate collections are created and occupy the heap too fast. By removing them
-    the heap is still filled but at a slower rate allowing us to produce elements of 2 magnitudes higher (tested) e.g 100.000.000 elements or 10.000 iterations 1.000 equations. The concern is
-    that we cannot benchmark with Criterium without the error occuring. Maybe if we also quadraple the heap...
-    
-    The schreenshot below is taken from the JVisualVM. It shows the aforementioned option for 10.000 iterations and 1.000 equations while benchmarking with Criterium, and an increased heap to 2Gb. The heap is dynamically adjusted by the JVM with maximum size 2GB. As it seems,
-    for some time it can handle the executions but after a while the heap is not enough and the GC starts working too much and not freeing space.
-    
-    ![alt text](test-bench-images/heap.png "heap 10.000 iterations, 1.000 equations")
-
-4. ~~To use primitives instead of boxed types in combination with 4.~~
-
-    As said earlier when primitives enter collections they are boxed and enter the heap. To avoid this we could use arrays. The problem is that this is possible only in the serial method and the across the system one.
-    The rest use as a synchronization mechanism ```promises``` inside the vectors with the results, which can't be put into arrays. So, this solution is not really an option.
-
-5. To keep only the data needed for next iterations     
-
-    From another perspective, we want to test how the methods compare to each other depending on execution speed. We don't care how or where the results are stored. Someone with better hardware will not have this issue,
-    some other won't store all the results in one data structure but instead will serialize them every x iterations.
-    
-    So, for the ```serial``` and the ```across the system methods```, this means to keep only the values of the previous iterations. 
-    
-    For the ```across the method``` and the ```mixed one```, this is dangerous as other threads might seek values produced long ago from a thread. In our case where the equations
-    have specific form, and the load is equally balanced among the threads, this shouldn't be possible and if we keep the last 10-100 results for each equation we should be ok.
-    
-6. Measures not related to the methods     
-
-    Increase heap size.  
-    Use the ```quick-bench``` mode of Criterium to execute less times each method. Between the executions, the GC can't clear all the data of the previous execution and the heap is filled more. 
-    By executing less times less garbage will be on heap between the executions and the benchmark will complete before the heap is completely occupied.
-
-### Regarding the parsing of the equations
-
-For high numbers of equations e.g 10.000 equations, the parsing takes a really long time (hours) complete.
-
-The solutions are:
-
-1. Cut down some steps which won't be used now, like the constant replacing, detection of non differential equations etc which are believed to be the root of the problem.
 
 ## Usage <a name="Usage"></a>
 
@@ -122,7 +27,7 @@ A folder named **target** will be created. Inside the folder their is a file nam
 
 An execution using the jar looks like this
 
-    java -jar test-bench-0.1.0-standalone.jar File-name Core-array Core-array-for-mixed Team-array Equation-array Max-equation-size-array Iterations-array Seed WeightLow WeightHigh Initial-value-low Initial-value-high Double-precision Linear?
+    java -jar test-bench-0.1.0-standalone.jar File-name Core-array Core-array-for-mixed Team-array Equation-array Max-equation-size-array Iterations-array Seed WeightLow WeightHigh Initial-value-low Initial-value-high Double-precision
 
 The arguments in the order they are taken are explained below
 
@@ -141,7 +46,6 @@ WeightHigh | Maximum value of coefficients | Double
 Initial-value-low | Minimum initial value of equations | Double
 Initial-value-high | Maximum initial value of equations | Double
 Double-precision | Decimal digits for coefficients | Integer
-Linear? | Linear or not | Boolean
 
 ## Example <a name="Example"></a>
 
