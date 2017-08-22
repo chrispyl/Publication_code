@@ -10,6 +10,7 @@
 			  [test-bench.mixed :refer [partition-labour-mixed]]
 			  [test-bench.stats :refer [std-deviation]]
 			  [test-bench.helper-functions :refer [get-date-time]]
+			  [test-bench.email :refer [send-mail]]
 			  [clojure.string :as str])
 	(:gen-class))	
 	
@@ -157,6 +158,7 @@
 						 _ (update-results-file file-name :mixed cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-for-mixed)] 
 				))))
 				
-			(spit "progress.txt" "All completed" :append true)))
+			(spit "progress.txt" "All completed" :append true)
+			(send-mail file-name "progress.txt")))
 		
 	
