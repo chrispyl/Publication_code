@@ -1,6 +1,6 @@
 (ns test-bench.across-the-method
-	(:require [test-bench.teamming :refer :all]
-			 [test-bench.topo-sort :refer :all]
+	(:require [test-bench.teamming :refer [create-subsystem]]
+			 [test-bench.topo-sort :refer [topol-sort]]
 			 [test-bench.serial :refer [remove-elements]]
 			 [test-bench.helper-functions :refer [repeatedly*]]
 			 [promissum.core :as promissum]))

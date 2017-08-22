@@ -1,6 +1,5 @@
 (ns test-bench.serial
-	(:require [clojure.set :as clset]
-			 [test-bench.topo-sort :refer :all]))
+	(:require [test-bench.topo-sort :refer [topol-sort]]))
 
 (defn remove-elements [differential? system-map]
 	(loop [ks (keys system-map) m system-map]

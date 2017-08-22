@@ -1,6 +1,6 @@
 (ns test-bench.mixed
-	(:require [test-bench.teamming :refer :all]
-			 [test-bench.topo-sort :refer :all]
+	(:require [test-bench.teamming :refer [work-sharing]]
+			 [test-bench.topo-sort :refer [topol-sort]]
 			 [test-bench.serial :refer [remove-elements]]
 			 [test-bench.across-the-method :refer [calc-funcs-in-chunk
 											  create-subsystem-list

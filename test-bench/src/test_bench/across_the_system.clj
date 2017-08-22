@@ -1,6 +1,5 @@
 (ns test-bench.across-the-system
-	(:require [clojure.set :as clset]
-			 [test-bench.serial :refer [serial-integration
+	(:require [test-bench.serial :refer [serial-integration
 									 remove-elements
 									 create-init-vals-map
 									 create-value-map
@@ -8,7 +7,7 @@
 									 create-fn-vector
 									 calc-func
 									 euler-method]]
-			 [test-bench.topo-sort :refer :all]))
+			 [test-bench.topo-sort :refer [topol-sort]]))
 
 
 (defn dependent-integration [iterations system-map produced-values-map fileValues]

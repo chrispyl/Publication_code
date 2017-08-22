@@ -1,8 +1,14 @@
 (ns test-bench.helper-functions)
 
+;Returns a strings containing the current date in the place of the machine
 (defn get-date-time []
 	(.toString (java.time.LocalDateTime/now)))
 
+;A faster implementation of 'repeatedly
+;Returns	a collection containing the outputs produced by f
+;coll - collection
+;n - integer
+;f - function
 (defn repeatedly*
   [coll n f]
   (if-not (instance? clojure.lang.IEditableCollection coll)
