@@ -6,8 +6,7 @@ The results are saved to a file chosen by the user.
 During the tests, a file named *progress.txt* is created which contains the test parameters being tested at that moment and other information.
 At the end of the tests, an email with the results attached is sent to notify that the tests have ended.
 
-[Problems](#Problems)  
-[Usage](#Usage)  
+ [Usage](#Usage)  
 [Arguments](#Arguments)  
 [Example](#Example)  
 [Benchmarking once](#Benchmarking_once)
