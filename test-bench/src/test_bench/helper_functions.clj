@@ -1,5 +1,8 @@
 (ns test-bench.helper-functions)
 
+(defn get-date-time []
+	(.toString (java.time.LocalDateTime/now)))
+
 (defn repeatedly*
   [coll n f]
   (if-not (instance? clojure.lang.IEditableCollection coll)

@@ -120,8 +120,7 @@
 		(map 
 			#(reduce (fn [v prom] (conj v @prom)) [] %) 
 			(map deref (vals fns-atoms-map)))))
-		
-;to system map exei ta panta, keys einia ta function names  
+		 
 (defn across-the-method-integration [iterations subsystems system-map fileValues]
 	(let [fns-atoms-map (create-fns-atoms-map system-map iterations)
 		 fns-atoms-map (put-fileValues-to-fns-atoms-map fns-atoms-map fileValues)
