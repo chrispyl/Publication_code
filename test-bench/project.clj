@@ -7,7 +7,9 @@
 				[rm-hull/infix "0.2.10"]
 				[criterium "0.4.4"]
 				[org.clojure/math.combinatorics "0.1.4"]
-				[funcool/promissum "0.3.3"]]
+				[funcool/promissum "0.3.3"]
+				[com.draines/postal "2.0.2"]
+				[dk.ative/docjure "1.11.0"]]
   :main ^:skip-aot test-bench.core
   :target-path "target/%s"
   :profiles {:uberjar {:aot :all}}
