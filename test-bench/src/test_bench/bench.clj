@@ -17,7 +17,7 @@
 		 subsystems-map (create-subsystem-map team-map system-map available-cores)]
 		subsystems-map))		  
 		  
-(defn prepare-across-the-method [system-map available-cores fileValues]
+(defn prepare-across-the-method [system-map available-cores]
 	(let [team-map (work-sharing (keys system-map) available-cores)
 		 subsystems (create-subsystem-list team-map system-map)]
 		subsystems))
@@ -111,7 +111,7 @@
 						 _ (update-results-file file-name :serial cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-serial)
 						 
 						 _ (write-calculating "across-the-method")
-						 subsystems (prepare-across-the-method-memo system-map cores {})
+						 subsystems (prepare-across-the-method-memo system-map cores)
 						 bench-result-across-the-method (bench-across-the-method-memo iterations subsystems system-map {})
 						 _ (write-done "across-the-method" benchmark-counter total-benchmarks)
 						 _ (increase-benchmark-counter benchmark-counter)
@@ -126,12 +126,12 @@
 						 
 						 _ (update-results-file file-name :across-the-system cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-across-the-system)
 						 
-						 _ (write-calculating "mixed")
-						 bench-result-for-mixed (bench-mixed-memo iterations subsystems-map cores-for-mixed {}) ;uses the subsystems-map created for across the system					
-						 _ (write-done "mixed" benchmark-counter total-benchmarks)
-						 _ (increase-benchmark-counter benchmark-counter)
+						 ;_ (write-calculating "mixed")
+						 ;bench-result-for-mixed (bench-mixed-memo iterations subsystems-map cores-for-mixed {}) ;uses the subsystems-map created for across the system					
+						 ;_ (write-done "mixed" benchmark-counter total-benchmarks)
+						 ;_ (increase-benchmark-counter benchmark-counter)
 						 
-						 _ (update-results-file file-name :mixed cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-for-mixed)
+						 ;_ (update-results-file file-name :mixed cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-for-mixed)
 						 ] 
 				))))
 				
