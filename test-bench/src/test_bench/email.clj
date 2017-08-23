@@ -1,5 +1,6 @@
 (ns test-bench.email
-	(:require [postal.core :as postal]))
+	(:require [postal.core :as postal]
+			 [test-bench.helper-functions :refer [remove-file-type]]))
 
 ;Sends an email to the specified recipient with the results and the report of the benchmarks attached
 ;results-file-name - string
@@ -15,4 +16,6 @@
 						:body [{:type :inline
 								:content (java.io.File. results-file-name)}
 							   {:type :inline
-								:content (java.io.File. progress-file-name)}]}))	
+								:content (java.io.File. progress-file-name)}
+							   {:type :inline
+								:content (java.io.File. (str (remove-file-type results-file-name) ".xlsx"))}]}))	

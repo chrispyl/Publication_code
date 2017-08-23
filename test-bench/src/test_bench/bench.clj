@@ -9,7 +9,6 @@
 			  [test-bench.mixed :refer [partition-labour-mixed]]
 			  [test-bench.stats :refer [std-deviation]]
 			  [test-bench.helper-functions :refer [get-date-time]]
-			  [test-bench.email :refer [send-mail]]
 			  [clojure.string :as str])
 	(:gen-class))
 
@@ -86,7 +85,7 @@
 
 (defn benchmark-procedure [file-name core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector seed weightLow weightHigh initial-value-low initial-value-high double-precision]
 	(let [benchmark-counter (atom 1)
-		 methods-benchmarked 4
+		 methods-benchmarked 3
 		 total-benchmarks (->> [core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector]
 							 (map count)
 							 (reduce * methods-benchmarked))]
@@ -136,5 +135,4 @@
 						 ] 
 				))))
 				
-			(spit "progress.txt" "All completed" :append true)
-			(send-mail file-name "progress.txt")))	
+			(spit "progress.txt" "All completed" :append true)))	
