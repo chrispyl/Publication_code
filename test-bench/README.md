@@ -4,7 +4,7 @@ The test-bench for our methods.
 The methods included are serial, across the method, across the system and mixed.  
 The results are saved to a file chosen by the user.  
 During the tests, a file named *progress.txt* is created which contains the test parameters being tested at that moment and other information.  
-At the end of the tests, an email with the results attached is sent to notify that the tests have ended.
+At the end of the tests, the results are put into an excel file. Also, an email with the results attached is sent to notify that the tests have ended.
 
  [Usage](#Usage)  
 [Arguments](#Arguments)  
