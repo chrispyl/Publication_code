@@ -43,7 +43,7 @@
 		final-value-map))			
 				 
 	
-(defn partition-labour-across-the-system [iterations subsystems-map system-map fileValues]
+(defn across-the-system-integration [iterations subsystems-map system-map fileValues]
 	(let [futures (doall ;without doall only 1 go starts
 					(map #(future (serial-integration iterations % fileValues)) (:independent subsystems-map)))
 		  independent-result (apply merge (map deref futures))

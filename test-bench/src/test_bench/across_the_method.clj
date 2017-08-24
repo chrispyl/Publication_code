@@ -103,8 +103,7 @@
 										dif-eqs-atoms
 										diff-eqs-store))
 								(dorun	
-									(map #(update-atom iteration 1 % %2 %3 %4 %5)
-									
+									(map #(update-atom iteration 1 % %2 %3 %4 %5)								
 										simple-eqs-param-names
 										simple-eqs-pull
 										simple-eqs-functions

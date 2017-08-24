@@ -14,7 +14,7 @@
 	(let [results-vectors (mapv #(vector (-> % :method name) (% :cores) (% :teams) (% :equations) (% :iterations) (% :mean) (% :variance) (% :std-deviation)) results)
 		 collumn-names (mapv name [:method :cores :teams :equations :iterations :mean :variance :std-deviation])
 		 wb (spreadsheet/create-workbook "Results"
-								(apply conj (conj [] collumn-names) results-vectors))]
+								(into [collumn-names] results-vectors))]
 		 (spreadsheet/save-workbook! (str (remove-file-type file-name) ".xlsx") wb)))	
 		 
 (defn create-excel [file-path file-name]
