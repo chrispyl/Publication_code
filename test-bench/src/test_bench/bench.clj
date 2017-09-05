@@ -5,7 +5,7 @@
 			  [test-bench.linear-system-generator :refer [linear-system-generator]]
 			  [test-bench.teamming :refer [create-team-map create-subsystem-map work-sharing]]
 			  [test-bench.serial :refer [serial-integration]]
-			  [test-bench.custom-benchmark :refer [bench-with-result wrap-in-do-nil]]
+			  [test-bench.custom-benchmark :refer [bench-with-result return-nil]]
 			  [test-bench.mixed :refer [mixed-integration]]
 			  [test-bench.stats :refer [std-deviation]]
 			  [test-bench.helper-functions :refer [get-date-time]]
@@ -41,19 +41,19 @@
 		add-std-deviation))	
 	
 (defn bench-serial [iterations system-map fileValues]
-	(-> (bench-with-result (wrap-in-do-nil (serial-integration iterations system-map fileValues)) :samples 10)
+	(-> (bench-with-result (return-nil (serial-integration iterations system-map fileValues)) :samples 10)
 		process-result-map))	
 		
 (defn bench-across-the-method [iterations subsystems system-map fileValues]
-	(-> (bench-with-result (wrap-in-do-nil (across-the-method-integration iterations subsystems system-map fileValues)) :samples 10)
+	(-> (bench-with-result (return-nil (across-the-method-integration iterations subsystems system-map fileValues)) :samples 10)
 		process-result-map))
 
 (defn bench-across-the-system [iterations subsystems-map system-map fileValues]
-	(-> (bench-with-result (wrap-in-do-nil (across-the-system-integration iterations subsystems-map system-map fileValues)) :samples 10)
+	(-> (bench-with-result (return-nil (across-the-system-integration iterations subsystems-map system-map fileValues)) :samples 10)
 		process-result-map))
 
 (defn bench-mixed [iterations subsystems-map cores-for-mixed fileValues]
-	(-> (bench-with-result (wrap-in-do-nil (mixed-integration iterations subsystems-map cores-for-mixed fileValues)) :samples 10)
+	(-> (bench-with-result (return-nil (mixed-integration iterations subsystems-map cores-for-mixed fileValues)) :samples 10)
 		process-result-map))		
 
 ;benchmark memoizations		
@@ -93,7 +93,7 @@
 
 (defn benchmark-procedure [file-name core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector seed weightLow weightHigh initial-value-low initial-value-high double-precision]
 	(let [benchmark-counter (atom 1)
-		 methods-benchmarked 4
+		 methods-benchmarked 3
 		 total-benchmarks (->> [core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector]
 							 (map count)
 							 (reduce * methods-benchmarked))]
@@ -134,13 +134,13 @@
 						 
 						 _ (update-results-file file-name :across-the-system cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-across-the-system)
 						 
-						 _ (write-calculating "mixed")
-						 mixed-subsystems-map (prepare-mixed-memo iterations across-the-system-subsystems-map cores-for-mixed)
-						 bench-result-for-mixed (bench-mixed-memo mixed-subsystems-map across-the-system-subsystems-map cores-for-mixed {})					
-						 _ (write-done "mixed" benchmark-counter total-benchmarks)
-						 _ (increase-benchmark-counter benchmark-counter)
+						 ;_ (write-calculating "mixed")
+						 ;mixed-subsystems-map (prepare-mixed-memo iterations across-the-system-subsystems-map cores-for-mixed)
+						 ;bench-result-for-mixed (bench-mixed-memo mixed-subsystems-map across-the-system-subsystems-map cores-for-mixed {})					
+						 ;_ (write-done "mixed" benchmark-counter total-benchmarks)
+						 ;_ (increase-benchmark-counter benchmark-counter)
 						 
-						 _ (update-results-file file-name :mixed cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-for-mixed)
+						 ;_ (update-results-file file-name :mixed cores number-of-equations number-of-teams max-equation-size iterations cores-for-mixed bench-result-for-mixed)
 						 ] 
 				))))
 				

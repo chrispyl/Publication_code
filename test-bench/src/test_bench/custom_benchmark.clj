@@ -1,12 +1,12 @@
 (ns test-bench.custom-benchmark
 	(:require  [criterium.core]))
 
-;Returns an expression wrapped in a (do nil)	block
+;Executes an expression and returns nil. Useful because Criterium saves the results of each run which can occupy a lot of space.
+;Must find a better way of doing it because the JVM may be able to optimize it in the future.
 ;expression - anything
-(defn wrap-in-do-nil [expression]
-	(do
-		expression
-		nil))	
+(defn return-nil [expression]
+	expression
+	nil)	
 
 ;Returns a map with the results of the benchmark
 ;expr - anything
