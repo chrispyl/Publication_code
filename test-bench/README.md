@@ -11,13 +11,13 @@ At the end of the tests, the results are put into an excel file. Also, an email 
 [Example](#Example)  
 [Benchmarking once](#Benchmarking_once)
 
-## Usage <a name="Usage"></a>
+## Building the project <a name="Usage"></a>
 
 Go to the project folder in the command line and type 
 
     lein uberjar
 
-A folder named **target** will be created. Inside the folder their is a file named **test-bench-0.1.0-standalone.jar**. To execute it, type
+A folder named **target** will be created. Inside ```target/uberjar``` there is a file named **test-bench-0.1.0-standalone.jar**. To execute it, type
 
     java -jar test-bench-0.1.0-standalone.jar arg1 arg2 ...
 
@@ -25,12 +25,13 @@ A folder named **target** will be created. Inside the folder their is a file nam
 
 An execution using the jar looks like this
 
-    java -jar test-bench-0.1.0-standalone.jar File-name Core-array Core-array-for-mixed Team-array Equation-array Max-equation-size-array Iterations-array Seed WeightLow WeightHigh Initial-value-low Initial-value-high Double-precision
+    java -jar test-bench-0.1.0-standalone.jar System-file-name File-name Core-array Core-array-for-mixed Team-array Equation-array Max-equation-size-array Iterations-array Seed WeightLow WeightHigh Initial-value-low Initial-value-high Double-precision
 
 The arguments in the order they are taken are explained below
 
 **Argument** | **Description** | **Type**
 --- | --- | ---
+System-file-name | The file name where the user system is | String
 File-name | The file name where the results should be saved | String
 Core-array | The cores for which to run the test-bench | Integers
 Core-array-for-mixed | The second layer of cores the mixed method uses | Integers
@@ -45,11 +46,25 @@ Initial-value-low | Minimum initial value of equations | Double
 Initial-value-high | Maximum initial value of equations | Double
 Double-precision | Decimal digits for coefficients | Integer
 
-## Example <a name="Example"></a>
+## Usage <a name="Example"></a>
 
-The arguments with *array* in their name are meant to be multiple and seperated by commas like below
+First of all, the arguments with *array* in their name are meant to be multiple and seperated by commas like below
 
-    java -jar test-bench-0.1.0-standalone.jar results.txt 5,10,15 2,4 10,20 100,1000,10000 5,6,7,8 50,100,1000 999 -5 5 0 10 2 false
+    java -jar test-bench-0.1.0-standalone.jar user-system.txt results.txt 5,10,15 2,4 10,20 100,1000,10000 5,6,7,8 50,100,1000 999 -5 5 0 10 2
+
+Also, it is possible to benchmark systems made by our generator as well as user defined systems. In the first case it is important to put
+an ```_``` as a System-file-name, an example call would be like this
+
+     java -jar test-bench-0.1.0-standalone.jar _ results.txt 5,10,15 2,4 10,20 100,1000,10000 5,6,7,8 50,100,1000 999 -5 5 0 10 2
+
+On the opposite, with a specific system as input a call would be done like this
+
+    java -jar test-bench-0.1.0-standalone.jar user-system.txt results.txt 5,10,15 2,4 10,20 100,1000,10000 5,6,7,8 50,100,1000 999 -5 5 0 10 2
+
+The user defined system must be in a file where one equation lies in each line. For example 
+
+    a'=a+b+1#0
+    b'=b+a#1
     
 ## Benchmarking once for every parameter combination <a name="Benchmarking_once"></a>
 
