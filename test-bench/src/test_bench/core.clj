@@ -17,14 +17,12 @@
 		split-at-comma
 		strings-to-ints))	
 	
-(defn parse-arrays [core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array]
+(defn parse-arrays [core-array team-array equation-array iterations-array]
 	(let [core-vector (parse-string core-array) 
-		 core-vector-for-mixed (parse-string core-array-for-mixed)
 		 team-vector (parse-string team-array)
 		 equation-vector (parse-string equation-array)
-		 max-equation-size-vector (parse-string max-equation-size-array)
 		 iterations-vector (parse-string iterations-array)]
-		[core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector]))	
+		[core-vector team-vector equation-vector iterations-vector]))	
 
 (defn parse-system-generator-arguments [seed weightLow weightHigh initial-value-low initial-value-high double-precision]
 	(let [seed (Integer/parseInt seed)
@@ -35,10 +33,10 @@
 		 double-precision (Integer/parseInt double-precision)]
 		[seed weightLow weightHigh initial-value-low initial-value-high double-precision]))			
 		
-(defn -main [file-name core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array seed weightLow weightHigh initial-value-low initial-value-high double-precision]
-	(let [[core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector] (parse-arrays core-array core-array-for-mixed team-array equation-array max-equation-size-array iterations-array)
+(defn -main [system-file-name file-name core-array team-array equation-array iterations-array seed weightLow weightHigh initial-value-low initial-value-high double-precision]
+	(let [[core-vector team-vector equation-vector iterations-vector] (parse-arrays core-array team-array equation-array iterations-array)
 		 [seed weightLow weightHigh initial-value-low initial-value-high double-precision] (parse-system-generator-arguments seed weightLow weightHigh initial-value-low initial-value-high double-precision)]
-		(benchmark-procedure file-name core-vector core-vector-for-mixed team-vector equation-vector max-equation-size-vector iterations-vector seed weightLow weightHigh initial-value-low initial-value-high double-precision)
+		(benchmark-procedure system-file-name file-name core-vector team-vector equation-vector iterations-vector seed weightLow weightHigh initial-value-low initial-value-high double-precision)
 		(create-excel (str (get-working-directory-path) "\\" file-name) file-name)
 		(send-mail file-name "progress.txt")))
 		

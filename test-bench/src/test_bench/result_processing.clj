@@ -11,8 +11,35 @@
 	(mapv read-string strings))		
 
 (defn write-to-excel [results file-name]
-	(let [results-vectors (mapv #(vector (-> % :method name) (% :cores) (% :teams) (% :equations) (% :iterations) (% :mean) (% :variance) (% :std-deviation)) results)
-		 collumn-names (mapv name [:method :cores :teams :equations :iterations :mean :variance :std-deviation])
+	(let [results-vectors (mapv #(vector (-> % :method name) 
+									 (% :cores) 
+									 (% :teams) 
+									 (% :equations) 
+									 (% :iterations) 
+									 (% :mean) 
+									 (% :variance) 
+									 (% :std-deviation) 
+									 (% :preprocessing-mean) 
+									 (% :preprocessing-variance) 
+									 (% :preprocessing-std-deviation) 
+									 (% :system-parsing-mean) 
+									 (% :system-parsing-variance) 
+									 (% :system-parsing-std-deviation))
+							results)
+		 collumn-names (mapv name [:method 
+								:cores 
+								:teams 
+								:equations 
+								:iterations 
+								:mean 
+								:variance 
+								:std-deviation 
+								:preprocessing-mean 
+								:preprocessing-variance 
+								:preprocessing-std-deviation 
+								:system-parsing-mean 
+								:system-parsing-variance 
+								:system-parsing-std-deviation])
 		 wb (spreadsheet/create-workbook "Results"
 								(into [collumn-names] results-vectors))]
 		 (spreadsheet/save-workbook! (str (remove-file-type file-name) ".xlsx") wb)))	
@@ -21,4 +48,4 @@
 	(-> file-path
 		read-file
 		strings-to-maps
-		(write-to-excel file-name)))		 
+		(write-to-excel file-name)))

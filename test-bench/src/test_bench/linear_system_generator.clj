@@ -28,7 +28,7 @@
 		(long number)
 		number))		
 
-;Creastes a random number in the range [lower-bound,higher-bound), with specified precision and if precision is 0 it casts it to long
+;Creates a random number in the range [lower-bound,higher-bound), with specified precision and if precision is 0 it casts it to long
 ;gen-state - object of type Random
 ;lower-bound - double number
 ;higher-bound - double number

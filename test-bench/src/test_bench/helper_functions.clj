@@ -1,6 +1,13 @@
 (ns test-bench.helper-functions
-	(:require [clojure.string :as str]))
+	(:require [clojure.string :as str]
+			 [clojure.java.io :as io]))
 
+;Reads a file line by line and returns a sequence with the results
+;file-name - string			 
+(defn get-lines [file-name]
+  (with-open [r (io/reader file-name)]
+    (doall (line-seq r))))	
+	
 ;Returns a strings containing the current date in the place of the machine
 (defn get-date-time []
 	(.toString (java.time.LocalDateTime/now)))

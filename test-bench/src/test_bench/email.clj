@@ -12,7 +12,7 @@
 						:ssl true}
 					   {:from ""
 						:to ""
-						:subject ""
+						:subject "Automated message: benchmarks completed"
 						:body [{:type :inline
 								:content (java.io.File. results-file-name)}
 							   {:type :inline

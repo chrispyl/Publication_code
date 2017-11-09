@@ -139,7 +139,7 @@
 					  dep-team-of-node-has-other-dependencies? (dependent-team-has-other-dependencies? (dependent-team-of-node node-neighbour dependent-teams) new-team in-map)
 					  node-of-dependent-team-has-other-dependencies? (node-has-other-dependencies? node-neighbour new-team in-map)] ;this can be a node of a dependent team, or a node that is a dependent team by itself														  
 					(if (not (empty? recruited)) ;if a recruit was found return what you found
-						[recruited after-removal-dep-teams] ;if no recruit found nothing is removed	from after-removal-dep-teams														  
+						[recruited after-removal-dep-teams] ;if no recruit found, nothing is removed	from after-removal-dep-teams														  
 						(if (not dep-team-of-node-has-other-dependencies?)
 							(recur nil nil dep-team-of-node-neighbour (remove-dep-team-from-dep-teams dep-team-of-node-neighbour dependent-teams)) ;nils to show that we dont care about that as the loops will stop
 							(if (not node-of-dependent-team-has-other-dependencies?)
