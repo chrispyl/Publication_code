@@ -15,7 +15,7 @@ At the end of the tests, the results are put into an excel file. Also, an email 
 ## Before building <a name="Before"></a>
 
 It is recommended to fill in the credentials of the ```email.clj``` file in order to get an email with the results. Otherwise, some errors will be printed
-in the console after the bencharking ends, but they won't affect the results or the produced files.
+in the console after the benchmarking ends, but they won't affect the results or the produced files.
 
 ## Building the project <a name="Building"></a>
 
