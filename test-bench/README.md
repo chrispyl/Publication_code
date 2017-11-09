@@ -6,12 +6,18 @@ The results are saved to a file chosen by the user.
 During the tests, a file named *progress.txt* is created which contains the test parameters being tested at that moment and other information.  
 At the end of the tests, the results are put into an excel file. Also, an email with the results attached is sent to notify that the tests have ended.
 
- [Usage](#Usage)  
+[Before building the project](#Before)  
+[Building the project](#Building)  
 [Arguments](#Arguments)  
-[Example](#Example)  
+[Usage](#Usage)  
 [Benchmarking once](#Benchmarking_once)
 
-## Building the project <a name="Usage"></a>
+## Before building <a name="Before"></a>
+
+It is recommended to fill in the credentials of the ```email.clj``` file in order to get an email with the results. Otherwise, some errors will be printed
+in the console after the bencharking ends, but they won't affect the results or the produced files.
+
+## Building the project <a name="Building"></a>
 
 Go to the project folder in the command line and type 
 
@@ -46,7 +52,7 @@ Initial-value-low | Minimum initial value of equations | Double
 Initial-value-high | Maximum initial value of equations | Double
 Double-precision | Decimal digits for coefficients | Integer
 
-## Usage <a name="Example"></a>
+## Usage <a name="Usage"></a>
 
 First of all, the arguments with *array* in their name are meant to be multiple and seperated by commas like below
 
